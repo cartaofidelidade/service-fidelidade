@@ -20,13 +20,13 @@ class AuthToken
         $auth = $headers->get('authorization');
 
         if (empty($auth))
-            return response()->json(['mensagem' => 'Não autorizado.'], 401);
+            return response()->json(['mensagem' => 'Chave de acesso obrigatória.'], 401);
 
         $tokens = TokensModel::where('Token', $auth)->first();
 
         if (!$tokens)
-            return response()->json(['mensagem' => 'Chave de acesso obrigatória.'], 401);
-        
+            return response()->json(['mensagem' => 'Acesso não autorizado.'], 401);
+
         $request->request->set('Local', $tokens['Id']);
 
         $response = $next($request);
