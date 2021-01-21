@@ -5,8 +5,8 @@ if (isset($router)) {
 
     $router->group(['prefix' => "/api"], function () use ($router) {
 
-        $router->get("/fidelidade/estados", "EstadosController@index");
-        $router->get("/fidelidade/cidades", "CidadesController@index");
+        $router->get("/estados", "EstadosController@index");
+        $router->get("/cidades", "CidadesController@index");
 
         $router->group(['prefix' => "/conta", 'middleware' => 'checkToken'], function () use ($router) {
             $router->post("/cadastro", "");
