@@ -8,7 +8,7 @@ if (isset($router)) {
         $router->get("/estados", "EstadosController@index");
         $router->get("/cidades", "CidadesController@index");
 
-        $router->group(['prefix' => "/conta", 'middleware' => 'checkToken'], function () use ($router) {
+        $router->group(['prefix' => "/conta"], function () use ($router) {
             $router->post("/cadastro", "");
             $router->post("/verifica-cadastro", "");
 
@@ -18,7 +18,7 @@ if (isset($router)) {
             $router->post("/recuperar-senha/{codigo}", "");
         });
 
-        $router->group(['prefix' => "/perfil", 'middleware' => 'checkToken'], function () use ($router) {
+        $router->group(['prefix' => "/perfil"], function () use ($router) {
             $router->get('/{Id}', '');
             $router->put('/{Id}', '');
         });
