@@ -4,15 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TokensModel extends Model
+class SegmentosModel extends Model
 {
     const CREATED_AT = "DtCadastro";
     const UPDATED_AT = "DtAlteracao";
 
-    protected $table = "tokens";
+    protected $table = "segmentos";
     protected $primaryKey = "Id";
 
-    protected $fillable = ['Token'];
+    protected $fillable = [
+        'Nome',
+        'Ativo'
+    ];
 
     protected $hidden = [];
 }
