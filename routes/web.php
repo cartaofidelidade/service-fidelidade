@@ -6,7 +6,7 @@ if (isset($router)) {
     $router->group(['prefix' => "/api"], function () use ($router) {
         $router->group(["prefix" => "/publica", "middleware" => "token"], function () use ($router) {
             $router->get("/estados", "EstadosController@index");
-            $router->get("/cidades", "CidadesController@index");
+            $router->get("/cidades/buscaCidadesEstados/{estadosId}", "CidadesController@buscaCidadesEstados");
             $router->get("/segmentos", "SegmentosController@index");
         });
 

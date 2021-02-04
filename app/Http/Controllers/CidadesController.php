@@ -13,9 +13,18 @@ class CidadesController extends Controller
         return response()->json($cidades, 200);
     }
 
-    public function show()
+    public function show(string $estadosId)
     {
-        $cidades = CidadesModel::where(['Ativo' => 1])->get();
+        $cidades = CidadesModel::where(['EstadosId' => $estadosId])->get();
         return response()->json($cidades, 200);
     }
+    public function buscaCidadesEstados($estadosId)
+    {
+      
+        $cidades = CidadesModel::where('EstadosId','=', 13)->get();
+        
+        return response()->json($cidades, 200);
+    }
+
+    // estadoId
 }
