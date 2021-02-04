@@ -1,7 +1,9 @@
 <?php
 
 if (isset($router)) {
-    $router->get("/", "FidelidadeController@index");
+    $router->get("/", function () {
+        return response()->json(['mensagem' => 'API Fidelidade'], 200);
+    });
 
     $router->group(['prefix' => "/api"], function () use ($router) {
         $router->group(["prefix" => "/publica", "middleware" => "token"], function () use ($router) {
@@ -42,14 +44,19 @@ if (isset($router)) {
             });
         });
 
-        $router->group(['prefix' => "/conta"], function () use ($router) {
-            $router->post("/cadastro", "");
-            $router->post("/verifica-cadastro", "");
+        $router->group(["prefix" => "/gerenciador"], function () use ($router) {
+            $router->group(["prefix" => "/conta", "middleware" => "token"], function () use ($router) {
+                $router->post("/login", "");
+                $router->post("/recuperar-senha", "");
+            });
 
-            $router->post("/login", "");
-
-            $router->post("/recuperar-senha", "");
-            $router->post("/recuperar-senha/{codigo}", "");
+            $router->group(['prefix' => "/segmentos", "middleware" => "clients"], function () use ($router) {
+                $router->get('/', 'SegmentosController@index');
+                $router->get('/{Id}', 'SegmentosController@show');
+                $router->post('/', 'SegmentosController@store');
+                $router->put('/{Id}', 'SegmentosController@update');
+                $router->delete('/{Id}', 'SegmentosController@delete');
+            });
         });
     });
 }

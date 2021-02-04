@@ -15,12 +15,7 @@ class AuthClients
      */
     public function handle($request, Closure $next)
     {
-        // Pre-Middleware Action
-
         $response = $next($request);
-
-        // Post-Middleware Action
-
         return $response;
     }
 }
