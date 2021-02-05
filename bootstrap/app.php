@@ -60,6 +60,13 @@ $app->singleton(
 
 $app->configure('app');
 
+$app->configure('mail');
+
+$app->alias('mailer', Illuminate\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
+
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -77,7 +84,7 @@ $app->middleware([Fruitcake\Cors\HandleCors::class]);
 // ]);
 
 $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
+    //     'auth' => App\Http\Middleware\Authenticate::class,
     'token' => \App\Http\Middleware\AuthToken::class,
     'clients' => \App\Http\Middleware\AuthClients::class,
     'establishments' => \App\Http\Middleware\AuthEstablishments::class
@@ -94,6 +101,7 @@ $app->routeMiddleware([
 |
 */
 
+$app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 $app->register(Fruitcake\Cors\CorsServiceProvider::class);
 

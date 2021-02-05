@@ -30,12 +30,12 @@ if (isset($router)) {
 
         $router->group(["prefix" => "/estabelecimentos"], function () use ($router) {
             $router->group(["prefix" => "/conta", "middleware" => "token"], function () use ($router) {
-                $router->post("/login", "");
+                $router->post("/login", "ContaEstabelecimentosController@login");
 
-                $router->post("/cadastro", "");
-                $router->post("/verifica-cadastro", "");
+                $router->post("/cadastro", "ContaEstabelecimentosController@register");
+                $router->post("/verifica-cadastro", "ContaEstabelecimentosController@checkRegister");
 
-                $router->post("/recuperar-senha", "");
+                $router->post("/recuperar-senha", "ContaEstabelecimentosController@forgot");
             });
 
             $router->group(['prefix' => "/perfil", "middleware" => "establishments"], function () use ($router) {
