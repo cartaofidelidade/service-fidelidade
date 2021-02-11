@@ -9,30 +9,26 @@ class IndividuosModel extends Model
     const CREATED_AT = "DataCadastro";
     const UPDATED_AT = "DataAlteracao";
 
-    protected $table = "individuos";
+    protected $table = "Individuos";
     protected $primaryKey = "Id";
 
     protected $fillable = [
+        'TipoPessoa',
         'Nome',
-        'Email',
-        'Ddd',
-        'Telefone',
-        'Whatsapp',
+        'NomeFantasia',
+        'Documento',
+        'InscricaoMunicipal',
+        'InscricaoEstadual',
+        'Rg',
+        'Orgao',
         'DataNascimento',
-        'Cep',
-        'Logradouro',
-        'Numero',
-        'Complemento',
-        'Bairro',
-        'IdCidades',
-        'IdEstados',
-        'Senha',
-        'Ativo',
-        'Documento'
+        'Naturalidade',
+        'Email',
+        'NomeResponsavel',
+        'DocumentoResponsavel',
+        'Ativo'
     ];
 
-    protected $hidden = [
-        'Senha'
-    ];
+    protected $hidden = [];
 }
 

@@ -11,8 +11,7 @@ class register extends Mailable
 {
     use Queueable, SerializesModels;
 
-    protected $nome;
-    protected $codigo;
+    private $data;
 
     /**
      * Create a new message instance.
@@ -21,8 +20,7 @@ class register extends Mailable
      */
     public function __construct($data)
     {
-        $this->nome = $data['Nome'];
-        $this->codigo = $data['Codigo'];
+        $this->data = $data;
     }
 
     /**
@@ -32,6 +30,11 @@ class register extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.register');
+        $this->subject('Novo Cadastro Cartão Fidelidade');
+        $this->to($this->data['Email'], $this->data['Nome']);
+        return $this->view('emails.register', [
+            'Nome' => $this->data['Nome'],
+            'Codigo' => $this->data['Codigo']
+        ]);
     }
 }

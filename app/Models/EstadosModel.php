@@ -9,7 +9,7 @@ class EstadosModel extends Model
     const CREATED_AT = "DtCadastro";
     const UPDATED_AT = "DtAlteracao";
 
-    protected $table = "estados";
+    protected $table = "Estados";
     protected $primaryKey = "Id";
 
     protected $fillable = [

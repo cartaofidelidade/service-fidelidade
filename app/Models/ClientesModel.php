@@ -13,7 +13,7 @@ class ClientesModel extends Model
     const CREATED_AT = "DataCadastro";
     const UPDATED_AT = "DataAlteracao";
 
-    protected $table = "clientes";
+    protected $table = "Clientes";
     protected $primaryKey = "Id";
 
     protected $fillable = [

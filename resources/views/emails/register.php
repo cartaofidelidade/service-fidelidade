@@ -16,10 +16,10 @@
         </tr>
         <tr>
             <td style="padding: 10px;">
-                <p>Seja bem vindo, <?= isset($nome) ? $nome : '' ?></p>
+                <p>Seja bem vindo, <?= isset($Nome) ? $Nome : '' ?></p>
                 <p>Para confirmar o seu cadastro click no link abaixo.:</p>
-                <a href="http://localhost:8000/usuarios/check-forgot/<?= isset($codigo) ? $codigo : '' ?>">
-                    http://localhost:8000/usuarios/check-forgot/<?= isset($codigo) ? $codigo : '' ?>
+                <a href="http://localhost:8000/usuarios/check-forgot/<?= isset($Codigo) ? $Codigo : '' ?>">
+                    http://localhost:8000/usuarios/check-forgot/<?= isset($Codigo) ? $Codigo : '' ?>
                 </a>
                 <p>Caso a solicitação tenha sido feita por engano, ignore este email.</p>
             </td>

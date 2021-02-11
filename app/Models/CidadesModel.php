@@ -9,7 +9,7 @@ class CidadesModel extends Model
     const CREATED_AT = "DtCadastro";
     const UPDATED_AT = "DtAlteracao";
 
-    protected $table = "cidades";
+    protected $table = "Cidades";
     protected $primaryKey = "Id";
 
     protected $fillable = [

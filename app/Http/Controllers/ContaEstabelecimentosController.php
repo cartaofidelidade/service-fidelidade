@@ -28,12 +28,12 @@ class ContaEstabelecimentosController extends Controller
         if ($validator->fails())
             return response()->json(['mensagem' => $validator->errors()->first()], 400);
 
-        $estabelecimento = EstabelecimentosModel::where(['Email' => $request->get('Email')])->first();
+        $usuarios = UsuariosModel::where(['Login' => $request->get('Email')])->first();
 
-        if (!$estabelecimento || !Hash::check($request->get('Senha'), $estabelecimento->Senha))
+        if (!$usuarios || !Hash::check($request->get('Senha'), $usuarios->Senha))
             return response()->json(['mensagem' => 'Os dados de Login e ou Senha estão incorretos.'], 400);
 
-        return response()->json(['Autorization' => base64_encode(base64_encode(json_encode($estabelecimento)) . $this->token)], 200);
+        return response()->json(['Autorization' => base64_encode(base64_encode(json_encode($usuarios)) . $this->token)], 200);
     }
 
     public function register(Request $request)
@@ -42,12 +42,16 @@ class ContaEstabelecimentosController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
+                'TipoPessoa' => 'required',
                 'Nome' => 'required',
                 'Segmento' => 'required',
                 'Email' => 'required|unique:Individuos,Email',
                 'Senha' => 'required'
             ],
-            ['required' => 'O campo :attribute é obrigatório.']
+            [
+                'required' => 'O campo :attribute é obrigatório.',
+                'unique' => 'O :attribute ja possui um registrado.'
+            ]
         );
 
         if ($validator->fails())
@@ -57,10 +61,12 @@ class ContaEstabelecimentosController extends Controller
 
         $individuos = new IndividuosModel();
 
+        $individuos->TipoPessoa = $request->get('TipoPessoa');
         $individuos->Nome = $request->get('Nome');
+        $individuos->NomeFantasia = $request->get('Nome');
         $individuos->Email = $request->get('Email');
 
-        if (!$$individuos->save()) {
+        if (!$individuos->save()) {
             DB::rollBack();
             return response()->json(['mensagem' => 'Erro ao efetuar o cadastro do indivíduo.'], 400);
         }
@@ -71,7 +77,7 @@ class ContaEstabelecimentosController extends Controller
         $usuarios->Login = $request->get('Email');
         $usuarios->Senha = Hash::make($request->get('Senha'));
 
-        if (!$$usuarios->save()) {
+        if (!$usuarios->save()) {
             DB::rollBack();
             return response()->json(['mensagem' => 'Erro ao efetuar o cadastro do usuário.'], 400);
         }
@@ -81,15 +87,18 @@ class ContaEstabelecimentosController extends Controller
         $estabelecimento->IndividuosId = $individuos['Id'];
         $estabelecimento->SegmentoId = $request->get('Segmento');
 
-        if (!$$estabelecimento->save()) {
+        if (!$estabelecimento->save()) {
             DB::rollBack();
             return response()->json(['mensagem' => 'Erro ao efetuar o cadastro do usuário.'], 400);
         }
 
-        $contato = ['email' => $individuos['Email'], 'name' => $individuos['Nome']];
+        $dadosEmail = [
+            'Nome' => $individuos['Nome'],
+            'Email' => $individuos['Email'],
+            'Codigo' => '123456',
+        ];
 
-        Mail::to($contato)->send(new register(['Nome' => $individuos['Nome'], 'Codigo' => '']));
-        Mail::failures();
+        Mail::send(new register($dadosEmail));
 
         DB::commit();
         return response()->json(['Id' => $estabelecimento['Id']], 200);

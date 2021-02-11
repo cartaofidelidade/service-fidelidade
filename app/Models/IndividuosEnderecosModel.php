@@ -9,7 +9,7 @@ class IndividuosEnderecosModel extends Model
     const CREATED_AT = "DataCadastro";
     const UPDATED_AT = "DataAlteracao";
 
-    protected $table = "individuosEnderecos";
+    protected $table = "IndividuosEnderecos";
     protected $primaryKey = "Id";
 
     protected $fillable = [

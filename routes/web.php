@@ -8,7 +8,7 @@ if (isset($router)) {
     $router->group(['prefix' => "/api"], function () use ($router) {
         $router->group(["prefix" => "/publica", "middleware" => "token"], function () use ($router) {
             $router->get("/estados", "EstadosController@index");
-            $router->get("/cidades/buscaCidadesEstados/{estadosId}", "CidadesController@buscaCidadesEstados");
+            $router->get("/cidades/{estadosId}", "CidadesController@buscaCidadesEstados");
             $router->get("/segmentos", "SegmentosController@index");
         });
 
@@ -33,14 +33,23 @@ if (isset($router)) {
                 $router->post("/login", "ContaEstabelecimentosController@login");
 
                 $router->post("/cadastro", "ContaEstabelecimentosController@register");
+                
                 $router->post("/verifica-cadastro", "ContaEstabelecimentosController@checkRegister");
-
+                
                 $router->post("/recuperar-senha", "ContaEstabelecimentosController@forgot");
             });
 
-            $router->group(['prefix' => "/perfil", "middleware" => "establishments"], function () use ($router) {
-                $router->get('/{Id}', '');
-                $router->put('/{Id}', '');
+            $router->group(['prefix' => "/campanhas", "middleware" => "establishments"], function () use ($router) {
+                $router->get('/', 'CampanhasController@index');
+                $router->post('/', 'CampanhasController@store');
+                $router->get('/{Id}', 'CampanhasController@show');
+                $router->put('/{Id}', 'CampanhasController@update');
+                $router->delete('/{Id}', 'CampanhasController@delete');
+            });
+
+            $router->group(['prefix' => "/clientes", "middleware" => "establishments"], function () use ($router) {
+                $router->get('/', 'ClientesController@index');
+                $router->get('/{Id}', 'ClientesController@show');
             });
         });
 

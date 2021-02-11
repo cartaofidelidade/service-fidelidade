@@ -13,19 +13,16 @@ class EstabelecimentosModel extends Model
     const CREATED_AT = "DataCadastro";
     const UPDATED_AT = "DataAlteracao";
 
-    protected $table = "estabelecimentos";
+    protected $table = "Estabelecimentos";
     protected $primaryKey = "Id";
 
     protected $fillable = [
         'IndividuosId',
         'SegmentoId',
-        'Ativo',
-
+        'Ativo'
     ];
 
-    protected $hidden = [
-        'Senha'
-    ];
+    protected $hidden = [];
 
     public function listaEstabelecimentos()
     {

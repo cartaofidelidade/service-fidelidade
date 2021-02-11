@@ -9,7 +9,7 @@ class IndividuosContatosModel extends Model
     const CREATED_AT = "DataCadastro";
     const UPDATED_AT = "DataAlteracao";
 
-    protected $table = "individuosContatos";
+    protected $table = "IndividuosContatos";
     protected $primaryKey = "Id";
 
     protected $fillable = [

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class ContaGerenciadorController extends Controller
+class CampanhasController extends Controller
 {
     //
 }
