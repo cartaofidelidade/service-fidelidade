@@ -31,20 +31,18 @@ if (isset($router)) {
         $router->group(["prefix" => "/estabelecimentos"], function () use ($router) {
             $router->group(["prefix" => "/conta", "middleware" => "token"], function () use ($router) {
                 $router->post("/login", "ContaEstabelecimentosController@login");
-
                 $router->post("/cadastro", "ContaEstabelecimentosController@register");
-                
                 $router->post("/verifica-cadastro", "ContaEstabelecimentosController@checkRegister");
-                
                 $router->post("/recuperar-senha", "ContaEstabelecimentosController@forgot");
             });
 
             $router->group(['prefix' => "/campanhas", "middleware" => "establishments"], function () use ($router) {
                 $router->get('/', 'CampanhasController@index');
+                $router->get('/{id}', 'CampanhasController@show');
+
                 $router->post('/', 'CampanhasController@store');
-                $router->get('/{Id}', 'CampanhasController@show');
-                $router->put('/{Id}', 'CampanhasController@update');
-                $router->delete('/{Id}', 'CampanhasController@delete');
+                $router->put('/{id}', 'CampanhasController@update');
+                $router->delete('/{id}', 'CampanhasController@delete');
             });
 
             $router->group(['prefix' => "/clientes", "middleware" => "establishments"], function () use ($router) {

@@ -30,5 +30,21 @@ class IndividuosModel extends Model
     ];
 
     protected $hidden = [];
+
+
+    public function contatos()
+    {
+        return $this->hasMany(IndividuosContatosModel::class, 'IndividuosId');
+    }
+
+    public function usuarios()
+    {
+        return $this->hasOne(UsuariosModel::class, 'IndividuosId');
+    }
+
+    public function enderecos()
+    {
+        return $this->hasMany(IndividuosEnderecosModel::class, 'IndividuosId');
+    }
 }
 

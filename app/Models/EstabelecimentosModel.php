@@ -24,16 +24,11 @@ class EstabelecimentosModel extends Model
 
     protected $hidden = [];
 
-    public function listaEstabelecimentos()
+    
+    public function individuo()
     {
-
-        $estabelecimentos = DB::table('estabelecimentos')
-            ->join('individuos', 'clientes.individuosId', '=', 'individuos.Id')
-            ->join('individuosContatos', 'individuos.id', '=', 'individuosContatos.individuosId')
-            ->join('individuosEnderecos', 'individuos.id', '=', 'individuosEnderecos.individuosId')
-            ->select('estabelecimentos.*','individuos.*', 'individuosContatos.*', 'individuosEnderecos.*')
-            ->get();
-
-        return $estabelecimentos;
+        return $this->belongsTo(IndividuosModel::class, 'IndividuosId')
+            ->with(['usuarios', 'enderecos', 'contatos']);
     }
+
 }

@@ -33,7 +33,7 @@ class ContaEstabelecimentosController extends Controller
         if (!$usuarios || !Hash::check($request->get('Senha'), $usuarios->Senha))
             return response()->json(['mensagem' => 'Os dados de Login e ou Senha estão incorretos.'], 400);
 
-        return response()->json(['Autorization' => base64_encode(base64_encode(json_encode($usuarios)) . $this->token)], 200);
+        return response()->json(['Autorization' => base64_encode(json_encode($usuarios))], 200);
     }
 
     public function register(Request $request)
