@@ -2,92 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\ClientesModel;
-use App\Models\IndividuosModel;
-use App\Models\IndividuosContatosModel;
-use App\Models\IndividuosEnderecosModel;
-
 use App\Models\EstabelecimentosModel;
-use PhpParser\Node\Stmt\TryCatch;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class EstabelecimentosController extends Controller
 {
-
-    private $data;
-    private $clientesModel;
-    private $individuosModel;
-    private $individuosContatosModel;
-    private $individuosEnderecosModel;
-    private $estabelecimentosModel;
-
-    public function __construct(
-        EstabelecimentosModel $estabelecimentosModel,
-        IndividuosContatosModel $individuosContatosModel,
-        IndividuosEnderecosModel $individuosEnderecosModel,
-        IndividuosModel $individuosModel
-
-    ) {
-        $this->estabelecimentosModel = $estabelecimentosModel;
-        $this->individuosModel = $individuosModel;
-        $this->individuosEnderecosModel = $individuosEnderecosModel;
-        $this->individuosContatosModel = $individuosContatosModel;
-    }
-
-    public function index($router)
+    public function store(Request $request)
     {
-        return $this->estabelecimentosModel->paginate(10);
-    }
+        DB::beginTransaction();
 
-    public function listaEstabelecimentos($router)
-    {
-        return $this->estabelecimentosModel->listaEstabelecimentos();
+        $validation = Validator::make(
+            $request->all(),
+            ['SegmentosId' => 'required',],
+            ['required' => 'O campo :attribute é obrigatório.']
+        );
 
-        if (count($this->data) > 0) {
-            return response()->json($this->data, 200);
-        } else {
-            return response()->json(['erro' => 'Nenhum registro encontro'], 200);
-        }
-    }
-
-    public function cadastro(Request $request)
-    {
-
-        $this->data = $this->individuosModel->create($request['Individuos']);
-
-        $contatos = $request['IndividuosContatos'];
-        $contatos['IndividuosId'] = $this->data->Id;
-
-        $this->data['individuosContatos'] = $this->individuosContatosModel->create($contatos);
-
-
-        if (!$this->data['individuosContatos']->Id) {
-
-            return response()->json('Erro ao cadastrar individuosContatos', 200);
+        if ($validation->fails()) {
+            DB::rollBack();
+            return response()->json(['message' => $validation->errors()->first()], 400);
         }
 
-        $enderecos = $request['IndividuosEnderecos'];
-        $enderecos['IndividuosId'] = $this->data->Id;
+        try {
+            $individuos = (new IndividuosController())->novoIndividuo($request->all());
 
-        $this->data['individuosEnderecos'] = $this->individuosEnderecosModel->create($enderecos);
+            $estabelecimentos = new EstabelecimentosModel();
 
-        if (!$this->data['individuosEnderecos']->Id) {
+            $estabelecimentos->IndividuosId = $individuos;
+            $estabelecimentos->SegmentosId = $request->SegmentosId;
 
-            return response()->json('Erro', 'Não cadastrar individuosEnderecos 200');
+            $estabelecimentos->save();
+
+            DB::commit();
+            return response()->json(['message' => 'Cadastro realizado com sucesso.']);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Não foi possível efetuar o cadastro do estabelecimento.'], 400);
         }
-
-
-        $estabelecimentos = $request['Estabelecimentos'];
-        $estabelecimentos['IndividuosId'] = $this->data->Id;
-
-
-        $this->data['estabelecimentos'] = $this->estabelecimentosModel->create($estabelecimentos);
-
-        if (!$this->data['estabelecimentos']->Id) {
-
-            return response()->json(['erro' => 'Erro ao cadastrar estabelecimento'], 200);
-        }
-
-        return response()->json(['Sucesso' => 'Estabelecimentos casdastrado com sucesso', 'Id' => $this->data['estabelecimentos']->Id], 200);
     }
 }

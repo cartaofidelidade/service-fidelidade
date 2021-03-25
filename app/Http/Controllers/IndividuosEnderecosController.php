@@ -4,63 +4,55 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\IndividuosEnderecosModel;
-
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class IndividuosEnderecosController extends Controller
 {
 
-    private $data;
-    private $model;
-
-    public function __construct(IndividuosEnderecosModel $individuosEnderecosModel)
+    public function novoIndividuoEnderecos(array $data, int $individuos)
     {
-        $this->model = $individuosEnderecosModel;
-    }
+        if (isset($data['Enderecos']) && count($data['Enderecos']) > 0) {
+            $resultado = [];
 
-    public function index($router)
-    {
-        return $this->model->paginate(10);
-    }
+            foreach ($data['Enderecos'] as $key => $value) {
+                $validation = Validator::make($value, [
+                    'Cep' => 'required',
+                    'Logradouro' => 'required',
+                    'Numero' => 'required',
+                    'Bairro' => 'required',
+                    'CidadesId' => 'required',
+                    'EstadosId' => 'required'
+                ], [
+                    'required' => 'O campo :attribute é obrigatório.'
+                ]);
 
-    public function buscaEnderecos($router)
-    {
-        return $this->model->find($router);
-    }
+                if ($validation->fails()) {
+                    DB::rollBack();
+                    return response()->json(['message' => $validation->errors()->first()], 400);
+                }
 
-    public function cadastro(Request $request)
-    {
-        $data = $this->model->create($request->all());
+                try {
+                    $individuosEnderecos = new IndividuosEnderecosModel();
 
-        if ($this->data->Id) {
-            return response()->json(['Sucesso' => 'Contato casdastrado com sucesso', 
-            'Id' => $this->data['estabelecimentos']->Id], 200);
+                    $individuosEnderecos->IndividuosId = $individuos;
+                    $individuosEnderecos->Cep = apenas_numeros($value['Cep']);
+                    $individuosEnderecos->Logradouro = $value['Logradouro'];
+                    $individuosEnderecos->Numero = $value['Numero'];
+                    $individuosEnderecos->Complemento = $value['Complemento'];
+                    $individuosEnderecos->Bairro = $value['Bairro'];
+                    $individuosEnderecos->CidadesId = $value['CidadesId'];
+                    $individuosEnderecos->EstadosId = $value['EstadosId'];
+
+                    $resultado[] = $individuosEnderecos['Id'];
+                } catch (Exception $e) {
+                    DB::rollBack();
+                    return response()->json(['message' => $e->getMessage()], 400);
+                }
+            }
+
+            return $resultado;
         }
-    }
-
-    public function update($router, Request $request)
-    {
-        $contatos = $this->model->find($router)->update($request->all());                  
-    
-        return response()
-            ->json([
-                'data' => [
-                    'message' => 'Curso foi atualizado com sucesso!'
-                ]
-            ]);
-    }
-
-
-    public function destroy($router)
-    {
-        $contatos = $this->model->find($router);
-
-        $contatos->delete();
-
-        return response()
-            ->json([
-                'data' => [
-                    'message' => 'Curso foi removido com sucesso!'
-                ]
-            ]);
     }
 }

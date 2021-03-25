@@ -14,17 +14,12 @@ class IndividuosContatosModel extends Model
 
     protected $fillable = [
         'IndividuosId',
+        'TipoContato',
         'Ddd',
         'Telefone',
         'Whatsapp',
-        'Padrao',
         'Ativo'
     ];
 
-    protected $hidden = [
-        'Senha'
-    ];
-
-
+    protected $hidden = [];
 }
-

@@ -6,11 +6,10 @@ if (isset($router)) {
     });
 
     $router->group(['prefix' => "/api"], function () use ($router) {
-        $router->group(["prefix" => "/publica", "middleware" => "token"], function () use ($router) {
-            $router->get("/estados", "EstadosController@index");
-            $router->get("/cidades/{estadosId}", "CidadesController@buscaCidadesEstados");
-            $router->get("/segmentos", "SegmentosController@index");
-        });
+        $router->get("/estados", "EstadosController@index");
+        $router->get("/cidades/{estadosId}", "CidadesController@buscaCidadesEstados");
+        $router->get("/segmentos", "SegmentosController@index");
+
 
         $router->group(["prefix" => "/clientes"], function () use ($router) {
             $router->group(["prefix" => "/conta", "middleware" => "token"], function () use ($router) {
@@ -29,11 +28,8 @@ if (isset($router)) {
         });
 
         $router->group(["prefix" => "/estabelecimentos"], function () use ($router) {
-            $router->group(["prefix" => "/conta", "middleware" => "token"], function () use ($router) {
-                $router->post("/login", "ContaEstabelecimentosController@login");
-                $router->post("/cadastro", "ContaEstabelecimentosController@register");
-                $router->post("/verifica-cadastro", "ContaEstabelecimentosController@checkRegister");
-                $router->post("/recuperar-senha", "ContaEstabelecimentosController@forgot");
+            $router->group(["prefix" => "/conta", "middleware" => "token"], function () use ($router) {            
+                $router->post("/cadastro", "EstabelecimentosController@store");
             });
 
             $router->group(['prefix' => "/campanhas", "middleware" => "establishments"], function () use ($router) {

@@ -34,17 +34,17 @@ class IndividuosModel extends Model
 
     public function contatos()
     {
-        return $this->hasMany(IndividuosContatosModel::class, 'IndividuosId');
-    }
-
-    public function usuarios()
-    {
-        return $this->hasOne(UsuariosModel::class, 'IndividuosId');
+        return $this->hasMany(IndividuosContatosModel::class);
     }
 
     public function enderecos()
     {
-        return $this->hasMany(IndividuosEnderecosModel::class, 'IndividuosId');
+        return $this->hasMany(IndividuosEnderecosModel::class);
+    }
+
+    public function usuarios()
+    {
+        return $this->hasOne(UsuariosModel::class);
     }
 }
 

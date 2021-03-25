@@ -32,7 +32,7 @@ class AuthEstablishments
         $estabelecimentos = EstabelecimentosModel::where(['IndividuosId' => $usuarios['IndividuosId']])->first();
 
         if (!$estabelecimentos)
-        return response()->json(['mensagem' => 'Acesso não autorizado.'], 401);
+            return response()->json(['mensagem' => 'Acesso não autorizado.'], 401);
 
         $request->request->set('Estabelecimento', $estabelecimentos['Id']);
 

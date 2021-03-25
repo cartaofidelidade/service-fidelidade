@@ -6,9 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class UsuariosModel extends Model
 {
-
-    private $id;
-
     const CREATED_AT = "DataCadastro";
     const UPDATED_AT = "DataAlteracao";
 
@@ -25,6 +22,4 @@ class UsuariosModel extends Model
     protected $hidden = [
         'Senha'
     ];
-
 }
-

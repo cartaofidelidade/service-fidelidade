@@ -21,12 +21,8 @@ class IndividuosEnderecosModel extends Model
         'Numero',
         'Complamento',
         'Bairro',
-        'Padrao',
         'Ativo'
     ];
 
-    protected $hidden = [
-        'Senha'
-    ];
+    protected $hidden = [];
 }
-

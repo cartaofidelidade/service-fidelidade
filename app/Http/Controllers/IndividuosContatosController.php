@@ -2,67 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\IndividuosContatosModel;
-use Illuminate\Routing\UrlGenerator;
-use Illuminate\Support\Facades\URL;
-
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class IndividuosContatosController extends Controller
 {
 
-    private $data;
-    private $model;
-
-    public function __construct(IndividuosContatosModel $individuosContatos)
+    public function novoIndividuosContatos(array $data, int $individuos)
     {
-        $this->model = $individuosContatos;
-    }
+        if (isset($data['Contatos']) && count($data['Contatos']) > 0) {
+            $resultado = [];
 
-    public function index($router)
-    {
-        return $this->model->paginate(10);
-    }
+            foreach ($data['Contatos'] as $key => $value) {
+                $validation = Validator::make($value, [
+                    'TipoContato' => 'required',
+                    'Ddd' => 'required',
+                    'Contato' => 'required',
+                    'Whatsapp' => 'required'
+                ], [
+                    'required' => 'O campo :attribute é obrigatório.'
+                ]);
 
-    public function buscaContatos($router)
-    {
+                if ($validation->fails()) {
+                    DB::rollBack();
+                    return response()->json(['message' => $validation->errors()->first()], 400);
+                }
 
-        return $this->model->find($router);
-    }
+                try {
+                    $individuosContatos = new IndividuosContatosModel();
 
-    public function cadastro(Request $request)
-    {
-        $data = $this->model->create($request->all());
+                    $individuosContatos->Individuos = $individuos;
+                    $individuosContatos->TipoContato = $value['TipoContato'];
+                    $individuosContatos->Ddd = $value['Ddd'];
+                    $individuosContatos->Contato = $value['Contato'];
+                    $individuosContatos->Whatsapp = $value['Whatsapp'];
 
-        if ($this->data->Id) {
-            return response()->json(['Sucesso' => 'Contato casdastrado com sucesso', 'Id' => $this->data['estabelecimentos']->Id], 200);
+                    $resultado[] = $individuosContatos['Id'];
+                } catch (Exception $e) {
+                    DB::rollBack();
+                    return response()->json(['message' => $e->getMessage()], 400);
+                }
+            }
+
+            return $resultado;
         }
-    }
-
-    public function update($router, Request $request)
-    {
-        $contatos = $this->model->find($router)->update($request->all());
-
-        return response()
-            ->json([
-                'data' => [
-                    'message' => 'Curso foi atualizado com sucesso!'
-                ]
-            ]);
-    }
-
-
-    public function destroy($router)
-    {
-        $contatos = $this->model->find($router);
-
-        $contatos->delete();
-
-        return response()
-            ->json([
-                'data' => [
-                    'message' => 'Curso foi removido com sucesso!'
-                ]
-            ]);
     }
 }
