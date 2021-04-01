@@ -6,10 +6,11 @@ if (isset($router)) {
     });
 
     $router->group(['prefix' => "/api"], function () use ($router) {
-        $router->get("/estados", "EstadosController@index");
-        $router->get("/cidades/{estadosId}", "CidadesController@buscaCidadesEstados");
-        $router->get("/segmentos", "SegmentosController@index");
-
+        $router->group(["prefix" => "/publica"], function () use ($router) {
+            $router->get("/estados", "EstadosController@index");
+            $router->get("/cidades/{estadosId}", "CidadesController@buscaCidadesEstados");
+            $router->get("/segmentos", "SegmentosController@index");
+        });
 
         $router->group(["prefix" => "/clientes"], function () use ($router) {
             $router->group(["prefix" => "/conta"], function () use ($router) {
