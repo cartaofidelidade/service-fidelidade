@@ -12,7 +12,7 @@ if (isset($router)) {
 
 
         $router->group(["prefix" => "/clientes"], function () use ($router) {
-            $router->group(["prefix" => "/conta", "middleware" => "token"], function () use ($router) {
+            $router->group(["prefix" => "/conta"], function () use ($router) {
                 $router->post("/login", "");
 
                 $router->post("/cadastro", "");
@@ -21,18 +21,18 @@ if (isset($router)) {
                 $router->post("/recuperar-senha", "");
             });
 
-            $router->group(['prefix' => "/perfil", "middleware" => "clients"], function () use ($router) {
+            $router->group(['prefix' => "/perfil"], function () use ($router) {
                 $router->get('/{Id}', '');
                 $router->put('/{Id}', '');
             });
         });
 
         $router->group(["prefix" => "/estabelecimentos"], function () use ($router) {
-            $router->group(["prefix" => "/conta", "middleware" => "token"], function () use ($router) {            
+            $router->group(["prefix" => "/conta"], function () use ($router) {
                 $router->post("/cadastro", "EstabelecimentosController@store");
             });
 
-            $router->group(['prefix' => "/campanhas", "middleware" => "establishments"], function () use ($router) {
+            $router->group(['prefix' => "/campanhas"], function () use ($router) {
                 $router->get('/', 'CampanhasController@index');
                 $router->get('/{id}', 'CampanhasController@show');
 
@@ -41,19 +41,19 @@ if (isset($router)) {
                 $router->delete('/{id}', 'CampanhasController@delete');
             });
 
-            $router->group(['prefix' => "/clientes", "middleware" => "establishments"], function () use ($router) {
+            $router->group(['prefix' => "/clientes"], function () use ($router) {
                 $router->get('/', 'ClientesController@index');
                 $router->get('/{Id}', 'ClientesController@show');
             });
         });
 
         $router->group(["prefix" => "/gerenciador"], function () use ($router) {
-            $router->group(["prefix" => "/conta", "middleware" => "token"], function () use ($router) {
+            $router->group(["prefix" => "/conta"], function () use ($router) {
                 $router->post("/login", "");
                 $router->post("/recuperar-senha", "");
             });
 
-            $router->group(['prefix' => "/segmentos", "middleware" => "clients"], function () use ($router) {
+            $router->group(['prefix' => "/segmentos"], function () use ($router) {
                 $router->get('/', 'SegmentosController@index');
                 $router->get('/{Id}', 'SegmentosController@show');
                 $router->post('/', 'SegmentosController@store');
