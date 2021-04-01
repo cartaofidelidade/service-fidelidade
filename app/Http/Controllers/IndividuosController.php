@@ -13,6 +13,10 @@ class IndividuosController extends Controller
 {
     public function novoIndividuo(array $data)
     {
+        $contatos = true;
+        $enderecos = true;
+        $usuarios = true;
+
         $validation = Validator::make($data, [
             'Nome' => 'required',
             'Email' => 'required|unique:Individuos,Email'
@@ -22,36 +26,30 @@ class IndividuosController extends Controller
             'unique' => 'Este :attribute já possui um registro.'
         ]);
 
-        if ($validation->fails()) {
+        if ($validation->fails())
+            return ['status' => 'erro', 'message' => $validation->errors()->first()];
+
+        $individuos = new IndividuosModel();
+
+        $individuos->TipoPessoa = $data['TipoPessoa'];
+        $individuos->Nome = $data['Nome'];
+        $individuos->NomeFantasia = $data['NomeFantasia'];
+        $individuos->Documento = apenas_numeros($data['Documento']);
+        $individuos->InscricaoMunicipal = apenas_numeros($data['InscricaoMunicipal']);
+        $individuos->InscricaoEstadual = apenas_numeros($data['InscricaoEstadual']);
+        $individuos->Rg = apenas_numeros($data['Rg']);
+        $individuos->Orgao = $data['Orgao'];
+        $individuos->DataNascimento = $data['DataNascimento'];
+        $individuos->Naturalidade = $data['Naturalidade'];
+        $individuos->Email = $data['Email'];
+        $individuos->NomeResponsavel = $data['NomeResponsavel'];
+        $individuos->DocumentoResponsavel = apenas_numeros($data['DocumentoResponsavel']);
+
+        if ($individuos->save()) {
+            return $individuos->Id;
+        } else {
             DB::rollBack();
-            return response()->json(['message' => $validation->errors()->first()], 400);
-        }
-
-        try {
-            $individuos = new IndividuosModel();
-
-            $individuos->TipoPessoa = $data['TipoPessoa'];
-            $individuos->Nome = $data['Nome'];
-            $individuos->NomeFantasia = $data['NomeFantasia'];
-            $individuos->Documento = apenas_numeros($data['Documento']);
-            $individuos->InscricaoMunicipal = apenas_numeros($data['InscricaoMunicipal']);
-            $individuos->InscricaoEstadual = apenas_numeros($data['InscricaoEstadual']);
-            $individuos->Rg = apenas_numeros($data['Rg']);
-            $individuos->Orgao = $data['Orgao'];
-            $individuos->DataNascimento = $data['DataNascimento'];
-            $individuos->Naturalidade = $data['Naturalidade'];
-            $individuos->Email = $data['Email'];
-            $individuos->NomeResponsavel = $data['NomeResponsavel'];
-            $individuos->DocumentoResponsavel = apenas_numeros($data['DocumentoResponsavel']);
-
-            (new IndividuosContatosController())->novoIndividuosContatos($data, $individuos['Id']);
-            (new IndividuosEnderecosController())->novoIndividuoEnderecos($data, $individuos['Id']);
-            (new UsuariosController())->novoUsuario($data, $individuos['Id']);
-
-            return $individuos['Id'];
-        } catch (Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => $e->getMessage()], 400);
+            return response()->json(['message' => 'Não foi possível efetuar o cadastro do individuo.'], 400);
         }
     }
 }

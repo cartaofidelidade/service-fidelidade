@@ -5,14 +5,14 @@ if (isset($router)) {
         return response()->json(['mensagem' => 'API Fidelidade'], 200);
     });
 
-    $router->group(['prefix' => "/api"], function () use ($router) {
-        $router->group(["prefix" => "/publica"], function () use ($router) {
+    $router->group(['prefix' => "api"], function () use ($router) {
+        $router->group(["prefix" => "publica"], function () use ($router) {
             $router->get("/estados", "EstadosController@index");
             $router->get("/cidades/{estadosId}", "CidadesController@buscaCidadesEstados");
             $router->get("/segmentos", "SegmentosController@index");
         });
 
-        $router->group(["prefix" => "/clientes"], function () use ($router) {
+        $router->group(["prefix" => "clientes"], function () use ($router) {
             $router->group(["prefix" => "/conta"], function () use ($router) {
                 $router->post("/login", "");
 
@@ -28,12 +28,12 @@ if (isset($router)) {
             });
         });
 
-        $router->group(["prefix" => "/estabelecimentos"], function () use ($router) {
+        $router->group(["prefix" => "estabelecimentos"], function () use ($router) {
             $router->group(["prefix" => "/conta"], function () use ($router) {
                 $router->post("/cadastro", "EstabelecimentosController@store");
             });
 
-            $router->group(['prefix' => "/campanhas"], function () use ($router) {
+            $router->group(['prefix' => "campanhas"], function () use ($router) {
                 $router->get('/', 'CampanhasController@index');
                 $router->get('/{id}', 'CampanhasController@show');
 

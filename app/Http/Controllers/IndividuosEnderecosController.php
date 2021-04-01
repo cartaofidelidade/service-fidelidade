@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\IndividuosEnderecosModel;
-use Exception;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class IndividuosEnderecosController extends Controller
@@ -28,31 +25,27 @@ class IndividuosEnderecosController extends Controller
                     'required' => 'O campo :attribute é obrigatório.'
                 ]);
 
-                if ($validation->fails()) {
-                    DB::rollBack();
-                    return response()->json(['message' => $validation->errors()->first()], 400);
-                }
+                if ($validation->fails())
+                    return ['status' => 'erro', 'message' => $validation->errors()->first()];
 
-                try {
-                    $individuosEnderecos = new IndividuosEnderecosModel();
+                $individuosEnderecos = new IndividuosEnderecosModel();
 
-                    $individuosEnderecos->IndividuosId = $individuos;
-                    $individuosEnderecos->Cep = apenas_numeros($value['Cep']);
-                    $individuosEnderecos->Logradouro = $value['Logradouro'];
-                    $individuosEnderecos->Numero = $value['Numero'];
-                    $individuosEnderecos->Complemento = $value['Complemento'];
-                    $individuosEnderecos->Bairro = $value['Bairro'];
-                    $individuosEnderecos->CidadesId = $value['CidadesId'];
-                    $individuosEnderecos->EstadosId = $value['EstadosId'];
+                $individuosEnderecos->IndividuosId = $individuos;
+                $individuosEnderecos->Cep = apenas_numeros($value['Cep']);
+                $individuosEnderecos->Logradouro = $value['Logradouro'];
+                $individuosEnderecos->Numero = $value['Numero'];
+                $individuosEnderecos->Complemento = $value['Complemento'];
+                $individuosEnderecos->Bairro = $value['Bairro'];
+                $individuosEnderecos->CidadesId = $value['CidadesId'];
+                $individuosEnderecos->EstadosId = $value['EstadosId'];
 
+                if ($individuosEnderecos->save()) {
                     $resultado[] = $individuosEnderecos['Id'];
-                } catch (Exception $e) {
-                    DB::rollBack();
-                    return response()->json(['message' => $e->getMessage()], 400);
+                } else {
+                    return ['status' => 'erro', 'message' => 'Erro ao efetuar o cadastro do endereço;'];
                 }
             }
-
-            return $resultado;
+            return ['status' => 'ok', 'message' => '', 'body' => $resultado];
         }
     }
 }

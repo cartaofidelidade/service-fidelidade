@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\IndividuosContatosModel;
-use Exception;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class IndividuosContatosController extends Controller
@@ -25,28 +23,25 @@ class IndividuosContatosController extends Controller
                     'required' => 'O campo :attribute é obrigatório.'
                 ]);
 
-                if ($validation->fails()) {
-                    DB::rollBack();
-                    return response()->json(['message' => $validation->errors()->first()], 400);
-                }
+                if ($validation->fails())
+                    return ['status' => 'erro', 'message' => $validation->errors()->first()];
 
-                try {
-                    $individuosContatos = new IndividuosContatosModel();
+                $individuosContatos = new IndividuosContatosModel();
 
-                    $individuosContatos->Individuos = $individuos;
-                    $individuosContatos->TipoContato = $value['TipoContato'];
-                    $individuosContatos->Ddd = $value['Ddd'];
-                    $individuosContatos->Contato = $value['Contato'];
-                    $individuosContatos->Whatsapp = $value['Whatsapp'];
+                $individuosContatos->Individuos = $individuos;
+                $individuosContatos->TipoContato = $value['TipoContato'];
+                $individuosContatos->Ddd = $value['Ddd'];
+                $individuosContatos->Contato = $value['Contato'];
+                $individuosContatos->Whatsapp = $value['Whatsapp'];
 
+                if ($individuosContatos->save()) {
                     $resultado[] = $individuosContatos['Id'];
-                } catch (Exception $e) {
-                    DB::rollBack();
-                    return response()->json(['message' => $e->getMessage()], 400);
+                } else {
+                    return ['status' => 'erro', 'message' => 'Erro ao efetuar o cadastro do contato.'];
                 }
             }
 
-            return $resultado;
+            return ['status' => 'ok', 'message' => '', 'body' => $resultado];
         }
     }
 }

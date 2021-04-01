@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\UsuariosModel;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -20,10 +19,8 @@ class UsuariosController extends Controller
                 'unique' => 'Este :attribute já possui um registro.'
             ]);
 
-            if ($validation->fails()) {
-                DB::rollBack();
-                return response()->json(['message' => $validation->errors()->first()], 400);
-            }
+            if ($validation->fails())
+                return ['status' => 'erro', 'message' => $validation->errors()->first()];
 
             $usuarios = new UsuariosModel();
 
@@ -32,10 +29,9 @@ class UsuariosController extends Controller
             $usuarios->Senha = Hash::make($data['Senha']);
 
             if ($usuarios->save()) {
-                return $usuarios['Id'];
+                return ['status' => 'ok', 'message' => '', 'body' => ['Id' => $usuarios->Id]];
             } else {
-                DB::rollBack();
-                return response()->json(['message' => 'Não foi possível efetuar o cadastro do usuario.']);
+                return ['status' => 'erro', 'message' => 'Não foi possível efetuar o cadastro do usuario.'];
             }
         }
     }

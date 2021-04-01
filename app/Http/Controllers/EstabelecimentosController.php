@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\EstabelecimentosModel;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -14,32 +13,36 @@ class EstabelecimentosController extends Controller
     {
         DB::beginTransaction();
 
+        $formData = $request->all();
+
+        dd($formData);
+
         $validation = Validator::make(
-            $request->all(),
+            $formData,
             ['SegmentosId' => 'required',],
             ['required' => 'O campo :attribute é obrigatório.']
         );
 
         if ($validation->fails()) {
             DB::rollBack();
-            return response()->json(['message' => $validation->errors()->first()], 400);
+            return response()->json(['mensagem' => $validation->errors()->first()], 400);
         }
 
-        try {
-            $individuos = (new IndividuosController())->novoIndividuo($request->all());
+        $individuos = (new IndividuosController())->novoIndividuo($formData);
 
-            $estabelecimentos = new EstabelecimentosModel();
+        $estabelecimentos = new EstabelecimentosModel();
 
-            $estabelecimentos->IndividuosId = $individuos;
-            $estabelecimentos->SegmentosId = $request->SegmentosId;
+        $estabelecimentos->IndividuosId = $individuos;
+        $estabelecimentos->SegmentosId = $request->SegmentosId;
 
-            $estabelecimentos->save();
+        $estabelecimentos->save();
 
+        if ($estabelecimentos->save()) {
             DB::commit();
-            return response()->json(['message' => 'Cadastro realizado com sucesso.']);
-        } catch (Exception $e) {
+            return response()->json(['mensagem' => 'Cadastro realizado com sucesso.']);
+        } else {
             DB::rollBack();
-            return response()->json(['message' => 'Não foi possível efetuar o cadastro do estabelecimento.'], 400);
+            return response()->json(['mensagem' => 'Não foi possível efetuar o cadastro do estabelecimento.'], 400);
         }
     }
 }
