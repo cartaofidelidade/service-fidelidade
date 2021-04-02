@@ -1,21 +1,26 @@
 <?php
 
-    namespace App\Http\Controllers;
+namespace App\Http\Controllers;
 
-    use App\Models\EstadosModel;
-    use Illuminate\Http\Request;
+use App\Models\Estados;
+use Illuminate\Http\Request;
 
-    class EstadosController extends Controller
+class EstadosController extends Controller
+{
+    public function index(Request $request)
     {
-        public function index()
-        {
-            $estados = EstadosModel::where(['Ativo' => 1])->get();
-            return response()->json($estados, 200);
-        }
+        $params = [];
 
-        public function show()
-        {
-            $estados = EstadosModel::where(['Ativo' => 1])->get();
-            return response()->json($estados, 200);
-        }
+        if (isset($request->nome) && !empty($request->nome))
+            $params['nome'] = $request->nome;
+
+        if (isset($request->sigla) && !empty($request->sigla))
+            $params['sigla'] = $request->sigla;
+
+        if (isset($request->id) && !empty($request->id))
+            $params['id'] = $request->id;
+
+        $estados = Estados::where($params)->get();
+        return response()->json($estados);
     }
+}

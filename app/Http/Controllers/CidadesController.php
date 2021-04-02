@@ -2,29 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CidadesModel;
+use App\Models\Cidades;
 use Illuminate\Http\Request;
 
 class CidadesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $cidades = CidadesModel::where(['Ativo' => 1])->get();
-        return response()->json($cidades, 200);
-    }
+        $params = [];
 
-    public function show(string $estadosId)
-    {
-        $cidades = CidadesModel::where(['EstadosId' => $estadosId])->get();
-        return response()->json($cidades, 200);
-    }
-    public function buscaCidadesEstados($estadosId)
-    {
-      
-        $cidades = CidadesModel::where('EstadosId','=', 13)->get();
-        
-        return response()->json($cidades, 200);
-    }
+        if (isset($request->nome) && !empty($request->nome))
+            $params['nome'] = $request->nome;
 
-    // estadoId
+        if (isset($request->estado) && !empty($request->estado))
+            $params['estados_id'] = $request->estado;
+
+        if (isset($request->id) && !empty($request->id))
+            $params['id'] = $request->id;
+
+        $cidades = Cidades::where($params)->get();
+        return response()->json($cidades);
+    }
 }

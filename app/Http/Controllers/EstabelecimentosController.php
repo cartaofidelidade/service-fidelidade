@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EstabelecimentosModel;
+use App\Models\Estabelecimentos;
+use App\Models\Usuarios;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class EstabelecimentosController extends Controller
@@ -15,34 +18,72 @@ class EstabelecimentosController extends Controller
 
         $formData = $request->all();
 
-        dd($formData);
-
         $validation = Validator::make(
             $formData,
-            ['SegmentosId' => 'required',],
-            ['required' => 'O campo :attribute é obrigatório.']
+            [
+                'nome' => 'required',
+                'email' => 'required|email|unique:estabelecimentos',
+                'documento' => 'required|unique:estabelecimentos',
+                'login' => 'required|unique:usuarios',
+                'senha' => 'required|min:6',
+                'segmentos_id' => 'required',
+                'estados_id' => 'required',
+                'cidades_id' => 'required',
+            ],
+            [
+                'required' => 'O campo :atribute é obrigatório',
+                'email' => 'O campo :attribute deve ser um endereço de e-mail válido.',
+                'unique' => 'O campo :attribute já possui um registro.',
+                'min' => 'O campo :attribute deve ser pelo menos :min caracteres.'
+            ]
         );
 
         if ($validation->fails()) {
             DB::rollBack();
-            return response()->json(['mensagem' => $validation->errors()->first()], 400);
+            return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
         }
 
-        $individuos = (new IndividuosController())->novoIndividuo($formData);
+        $estabelecimentos = new Estabelecimentos();
 
-        $estabelecimentos = new EstabelecimentosModel();
-
-        $estabelecimentos->IndividuosId = $individuos;
-        $estabelecimentos->SegmentosId = $request->SegmentosId;
-
-        $estabelecimentos->save();
+        $estabelecimentos->tipo_pessoa = $formData['tipo_pessoa'];
+        $estabelecimentos->nome = $formData['nome'];
+        $estabelecimentos->nome_fantasia = $formData['nome_fantasia'] ?? null;
+        $estabelecimentos->documento = $formData['documento'];
+        $estabelecimentos->email = $formData['email'];
+        $estabelecimentos->celular = $formData['celular'] ?? null;
+        $estabelecimentos->telefone = $formData['telefone'] ?? null;
+        $estabelecimentos->facebook = $formData['facebook'] ?? null;
+        $estabelecimentos->instagram = $formData['instagram'] ?? null;
+        $estabelecimentos->site = $formData['site'] ?? null;
+        $estabelecimentos->cep = $formData['cep'] ?? null;
+        $estabelecimentos->logradouro = $formData['logradouro'] ?? null;
+        $estabelecimentos->numero = $formData['numero'] ?? null;
+        $estabelecimentos->complemento = $formData['complemento'] ?? null;
+        $estabelecimentos->bairro = $formData['bairro'] ?? null;
+        $estabelecimentos->logomarca = $formData['logomarca'] ?? null;
+        $estabelecimentos->estados_id = $formData['estados_id'];
+        $estabelecimentos->cidades_id = $formData['cidades_id'];
+        $estabelecimentos->segmentos_id = $formData['segmentos_id'];
 
         if ($estabelecimentos->save()) {
-            DB::commit();
-            return response()->json(['mensagem' => 'Cadastro realizado com sucesso.']);
+
+            $usuarios = new Usuarios();
+
+            $usuarios->login = $formData['login'];
+            $usuarios->senha = Hash::make($formData['senha']);
+            $usuarios->origem = 1;
+            $usuarios->origem_id = $estabelecimentos->id;
+
+            if ($usuarios->save()) {
+                DB::commit();
+                return response()->json($estabelecimentos);
+            } else {
+                DB::rollBack();
+                return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do usuário.'], 400);
+            }
         } else {
             DB::rollBack();
-            return response()->json(['mensagem' => 'Não foi possível efetuar o cadastro do estabelecimento.'], 400);
+            return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do estabelecimento.'], 400);
         }
     }
 }

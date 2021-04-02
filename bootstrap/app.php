@@ -59,13 +59,11 @@ $app->singleton(
 */
 
 $app->configure('app');
-
 $app->configure('mail');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
-
 
 /*
 |--------------------------------------------------------------------------
@@ -84,10 +82,7 @@ $app->middleware([Fruitcake\Cors\HandleCors::class]);
 // ]);
 
 $app->routeMiddleware([
-    //     'auth' => App\Http\Middleware\Authenticate::class,
-    'token' => \App\Http\Middleware\AuthToken::class,
-    'clients' => \App\Http\Middleware\AuthClients::class,
-    'establishments' => \App\Http\Middleware\AuthEstablishments::class
+    'auth' => App\Http\Middleware\Authenticate::class
 ]);
 
 /*
@@ -101,12 +96,13 @@ $app->routeMiddleware([
 |
 */
 
+$app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 $app->register(Fruitcake\Cors\CorsServiceProvider::class);
 
-// $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
 /*
@@ -120,10 +116,12 @@ $app->register(Fruitcake\Cors\CorsServiceProvider::class);
 |
 */
 
-$app->router->group([
-    'namespace' => 'App\Http\Controllers',
-], function ($router) {
+$app->router->group(['namespace' => 'App\Http\Controllers',], function ($router) {
     require __DIR__ . '/../routes/web.php';
 });
+
+$app->instance('path.config', app()->basePath() . DIRECTORY_SEPARATOR . 'config');
+$app->instance('path.storage', app()->basePath() . DIRECTORY_SEPARATOR . 'storage');
+
 
 return $app;

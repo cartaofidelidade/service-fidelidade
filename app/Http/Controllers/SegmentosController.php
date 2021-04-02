@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Segmentos;
 use App\Models\SegmentosModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -10,37 +11,40 @@ class SegmentosController extends Controller
 {
     public function index()
     {
-        $seguimentos = SegmentosModel::where(['Ativo' => 1])->get();
+        $params = [];
+
+        $params['ativo'] = 1;
+
+        $seguimentos = Segmentos::where($params)->get();
         return response()->json($seguimentos);
     }
 
     public function show($id)
     {
-        $seguimento = SegmentosModel::where(['Ativo' => 1, 'Id' => $id])->first();
+        $seguimento = Segmentos::where(['ativo' => 1, 'id' => $id])->first();
         return response()->json($seguimento);
     }
 
     public function store(Request $request)
     {
 
+        $formData = $request->only('nome');
+
         $validator = Validator::make(
-            $request->all(),
-            ['Nome' => 'required'],
-            ['required' => 'O campo :attribute é obrigatório.']
+            $formData,
+            ['nome' => 'required']
         );
 
         if ($validator->fails())
             return response()->json(['mensagem' => $validator->errors()->first()], 400);
 
-        $segmento = new SegmentosModel();
+        $segmento = new Segmentos();
+        $segmento->nome = $formData['nome'];
 
-        $segmento->Nome = $request->get('Nome');
-        $segmento = $segmento->save();
-
-        if ($segmento)
+        if ($segmento->save())
             return response()->json($segmento);
 
-        return response()->json(['mesnagem' => 'Não foi possível realizar o cadastro.'], 400);
+        return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro.'], 400);
     }
 
     public function update(Request $request, $id)
@@ -55,10 +59,10 @@ class SegmentosController extends Controller
         if ($validator->fails())
             return response()->json(['mensagem' => $validator->errors()->first()], 400);
 
-        $segmento = SegmentosModel::where(['Id' => $id])->first();
+        $segmento = Segmentos::where(['Id' => $id])->first();
 
         if (!$segmento)
-            return response()->json(['mensagem' => 'Segmento não encontrado.'], 400);
+            return response()->json(['status' => 'erro', 'mensagem' => 'Segmento não encontrado.'], 400);
 
 
         $segmento->Nome = $request->get('Nome');
@@ -67,12 +71,12 @@ class SegmentosController extends Controller
         if ($segmento)
             return response()->json($segmento);
 
-        return response()->json(['mesnagem' => 'Não foi possível atualizar o cadastro.'], 400);
+        return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível atualizar o cadastro.'], 400);
     }
 
     public function delete($id)
     {
-        $segmento = SegmentosModel::where(['Id' => $id])->first();
+        $segmento = Segmentos::where(['Id' => $id])->first();
 
         if (!$segmento)
             return response()->json(['mensagem' => 'Segmento não encontrado.'], 400);
