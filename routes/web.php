@@ -14,8 +14,10 @@ if (isset($router)) {
 
         $router->group(["prefix" => "estabelecimentos"], function () use ($router) {
             $router->group(["prefix" => "conta"], function () use ($router) {
-                $router->post("/cadastro", "EstabelecimentosController@store");
                 $router->post("/login", "AuthController@loginEstabelecimento");
+
+                $router->post("/cadastro", "EstabelecimentosController@store");
+                $router->post("/editar", "EstabelecimentosController@update");
             });
 
             $router->group(['prefix' => "campanhas"], function () use ($router) {
