@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 class AuthController extends Controller
 {
 
-    public function loginEstabelecimento(Request $request)
+    public function authEstabelecimento(Request $request)
     {
         $data = $request->only('login', 'senha');
 
