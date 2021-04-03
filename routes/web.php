@@ -18,7 +18,7 @@ if (isset($router)) {
                 $router->post("/logout", "AuthController@logout");
 
                 $router->post("/cadastro", "EstabelecimentosController@store");
-                $router->post("/editar", "EstabelecimentosController@update");
+                $router->post("/editar/{id}", "EstabelecimentosController@update");
             });
 
             $router->group(['prefix' => "campanhas"], function () use ($router) {
