@@ -70,7 +70,7 @@ class CampanhasController extends Controller
 
     }
 
-    public function update()
+    public function update(Request $reques, $id)
     {
     }
 
