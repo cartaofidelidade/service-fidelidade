@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Estabelecimentos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -9,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 class AuthController extends Controller
 {
 
-    public function loginEstabelecimento(Request $request)
+    public function authEstabelecimento(Request $request)
     {
         $data = $request->only('login', 'senha');
 
@@ -30,10 +31,10 @@ class AuthController extends Controller
         $token = Auth::attempt(['login' => $data['login'], 'password' => $data['senha']]);
 
         if (!$token)
-            return response()->json(['status' => 'erro', 'mensagem' => 'Não autorizado'], 401);
+            return response()->json(['status' => 'erro', 'mensagem' => 'Os dados de Login e ou Senha estão inválidos.'], 400);
 
-
-        return $this->respondWithToken($token);
+        $estabelecimento = Estabelecimentos::find(Auth::user()->origem_id);
+        return $this->respondWithToken($token, $estabelecimento->nome, $estabelecimento->id);
     }
 
     public function logout()
@@ -47,12 +48,13 @@ class AuthController extends Controller
         return 'login';
     }
 
-    protected function respondWithToken($token)
+    protected function respondWithToken($token, $usuario, $id)
     {
         return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => Auth::factory()->getTTL() * 60
+            'status' => 'ok',
+            'token' => $token,
+            'usuario' => $usuario,
+            'id' => $id
         ]);
     }
 }

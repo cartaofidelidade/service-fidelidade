@@ -49,25 +49,26 @@ class CampanhasController extends Controller
         if ($validation->fails())
             return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
 
-         $campanhas = new Campanhas();
+        $campanhas = new Campanhas();
 
-         $campanhas->estabelecimentos_id = $estabelecimento->origem_id;
-         $campanhas->codigo = substr(uniqid(rand()), 0, 6);
-         $campanhas->nome = $formData['nome'];
-         $campanhas->tipo = $formData['tipo'];
+        $campanhas->estabelecimentos_id = $estabelecimento->origem_id;
+        $campanhas->codigo = substr(uniqid(rand()), 0, 6);
+        $campanhas->nome = $formData['nome'];
+        $campanhas->tipo = $formData['tipo'];
 
-         $campanhas->pontos = $formData['pontos']??0;
-         $campanhas->quantidade_carimbos = $formData['quantidade_carimbos'];
-         $campanhas->limite_carimbos_dia = $formData['limite_carimbos_dia'];
-         $campanhas->data_inicio = $formData['data_inicio'];
-         $campanhas->data_final = $formData['data_final'];
-         $campanhas->descricao = $formData['descricao'];
+        $campanhas->pontos = $formData['pontos'] ?? 0;
+        $campanhas->quantidade_carimbos = $formData['quantidade_carimbos'];
+        $campanhas->limite_carimbos_dia = $formData['limite_carimbos_dia'];
+        $campanhas->data_inicio = $formData['data_inicio'];
+        $campanhas->data_final = $formData['data_final'];
+        $campanhas->descricao = $formData['descricao'];
 
-         if ($campanhas->save())
+        $campanhas->imagem_carimbo_preenchido = $this->uploadImagem($formData['imagem_carimbo_preenchido']) ?? null;
+        $campanhas->imagem_carimbo_vazio = $this->uploadImagem($formData['imagem_carimbo_vazio']) ?? null;
+
+        if ($campanhas->save())
             return response()->json($campanhas);
         return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível cadastrar a campanha.'], 400);
-
-
     }
 
     public function update(Request $reques, $id)
@@ -76,5 +77,13 @@ class CampanhasController extends Controller
 
     public function delete()
     {
+    }
+
+    private function uploadImagem($file = null, $path = null): string
+    {
+        if (is_null($file) || is_null($path))
+            return false;
+
+
     }
 }
