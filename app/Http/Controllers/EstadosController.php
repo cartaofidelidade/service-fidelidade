@@ -20,7 +20,7 @@ class EstadosController extends Controller
         if (isset($request->id) && !empty($request->id))
             $params['id'] = $request->id;
 
-        $estados = Estados::where($params)->get();
+        $estados = Estados::where($params)->orderBy('nome')->get();
         return response()->json($estados);
     }
 }

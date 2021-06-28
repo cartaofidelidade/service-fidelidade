@@ -20,9 +20,12 @@ class EstabelecimentosController extends Controller
 
     public function store(Request $request)
     {
+ 
         DB::beginTransaction();
 
         $formData = $request->all();
+
+        
 
         $validation = Validator::make(
             $formData,
@@ -43,7 +46,7 @@ class EstabelecimentosController extends Controller
                 'min' => 'O campo :attribute deve ser pelo menos :min caracteres.'
             ]
         );
-
+        
         if ($validation->fails()) {
             DB::rollBack();
             return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
@@ -138,6 +141,9 @@ class EstabelecimentosController extends Controller
         $estabelecimentos->estados_id = $formData['estados_id'];
         $estabelecimentos->cidades_id = $formData['cidades_id'];
         $estabelecimentos->segmentos_id = $formData['segmentos_id'];
+
+
+        dd($estabelecimento);
 
         if ($estabelecimentos->save())
             return response()->json($estabelecimentos);

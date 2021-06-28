@@ -8,7 +8,9 @@ if (isset($router)) {
     $router->group(['prefix' => "api"], function () use ($router) {
         $router->group(["prefix" => "publica"], function () use ($router) {
             $router->get("/estados", "EstadosController@index");
-            $router->get("/cidades", "CidadesController@index");
+            $router->get("/cidades/buscaCidades/{id}", "CidadesController@buscasCidades");
+            $router->get('/cidades', "CidadesController@index");
+            
             $router->get("/segmentos", "SegmentosController@index");
         });
 
@@ -25,7 +27,7 @@ if (isset($router)) {
                 $router->get('/', 'CampanhasController@index');
                 $router->get('/{id}', 'CampanhasController@show');
 
-                $router->post('/', 'CampanhasController@store');
+                $router->post('/cadastro', 'CampanhasController@store');
                 $router->put('/{id}', 'CampanhasController@update');
                 $router->delete('/{id}', 'CampanhasController@delete');
             });
