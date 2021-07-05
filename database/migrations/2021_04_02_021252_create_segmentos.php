@@ -17,8 +17,6 @@ class CreateSegmentos extends Migration
             $table->uuid('id')->primary();
             $table->string('nome', 100);
             $table->tinyInteger('ativo')->default(1);
-            $table->timestamp('data_cadastro', 0);
-            $table->timestamp('data_alteracao', 0);
         });
     }
 

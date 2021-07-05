@@ -24,3 +24,5 @@ class EstadosController extends Controller
         return response()->json($estados);
     }
 }
+
+// http://127.0.0.1:8000/api/

@@ -3,9 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Estabelecimentos;
+use App\Models\Usuarios;
+use App\Mail\Forgot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -56,5 +61,47 @@ class AuthController extends Controller
             'usuario' => $usuario,
             'id' => $id
         ]);
+    }
+
+    public function recuperarSenha(Request $request)
+    {
+        $formData = $request->all();
+        $usuario = Usuarios::where('login', '=', $formData['email'])->get();
+
+
+        if (!isset($usuario[0]->id))
+            return response()->json(['status' => 'erro', 'mensagem' => 'Usuario não localizado.'], 400);
+
+  
+        $usuarios = Usuarios:: find($usuario[0]->id);
+        $usuarios->tokenAlteracaoSenha =rand(1, 10000);
+
+        if ($usuarios->save()) {
+            Mail::to($formData['email'])->send(new Forgot($usuario[0]));
+            return response()->json($usuarios);
+        }
+    }
+
+    public function alterarSenha(Request $request)
+    {
+
+        $formData = $request->all();
+        
+        // return response()->json($formData);
+
+        $usuario = Usuarios::where('tokenAlteracaoSenha', '=', $formData['token'])->get();
+
+        if (!isset($usuario[0]->id))
+            return response()->json(['status' => 'erro', 'mensagem' => 'Usuario não localizado.'], 400);
+
+
+        $usuarios = Usuarios:: find($usuario[0]->id);
+        $usuarios->senha = Hash::make($formData['senha']);
+        $usuarios->tokenAlteracaoSenha = null;
+
+        if ($usuarios->save()) {
+            // DB::commit();
+            return response()->json($usuarios);
+        }
     }
 }

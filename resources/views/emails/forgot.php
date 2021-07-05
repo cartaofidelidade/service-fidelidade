@@ -15,9 +15,10 @@
     <tr>
         <td style="padding: 10px;">
             <p>Foi feita a solicitação para geração de uma nova senha.</p>
+            <p>Token:<?= isset($codigo) ? $codigo : '' ?></p>
             <p>Para confirmar a geração da nova senha clique no link abaixo:</p>
-            <a href="http://localhost:8000/usuarios/check-forgot/<?= isset($codigo) ? $codigo : '' ?>">
-                http://localhost:8000/usuarios/check-forgot/<?= isset($codigo) ? $codigo : '' ?>
+            <a href="http://localhost:3000/conta/alterarSenha/<?= isset($codigo) ? $codigo : '' ?>">
+                http://localhost:3000/conta/alterarSenha/<?= isset($codigo) ? $codigo : '' ?>
             </a>
             <p>Caso a solicitação tenha sido feita por engano, ignore este email.</p>
         </td>

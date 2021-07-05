@@ -20,9 +20,7 @@ class CreateCartelasHistorico extends Migration
 
             $table->tinyInteger('ativo')->default(1);
 
-            $table->timestamp('data_cadastro', 0);
-            $table->timestamp('data_alteracao', 0); 
-
+            $table->timestamps();
             $table->foreignUuid('cartelas_id')->references('id')->on('cartelas');
         });
     }
