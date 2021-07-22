@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Clientes;
 use App\Models\Estabelecimentos;
 use App\Models\Usuarios;
 use App\Mail\Forgot;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
 
-    public function authEstabelecimento(Request $request)
+    public function auth(Request $request)
     {
         $data = $request->only('login', 'senha');
 
@@ -38,8 +39,15 @@ class AuthController extends Controller
         if (!$token)
             return response()->json(['status' => 'erro', 'mensagem' => 'Os dados de Login e ou Senha estão inválidos.'], 400);
 
-        $estabelecimento = Estabelecimentos::find(Auth::user()->origem_id);
-        return $this->respondWithToken($token, $estabelecimento->nome, $estabelecimento->id);
+        $origem = Auth::user()->origem;
+
+        $usuario = Estabelecimentos::find(Auth::user()->origem_id);
+
+        if ((int)$origem === 2)
+            $usuario = Clientes::find(Auth::user()->origem_id);
+
+
+        return $this->respondWithToken($token, $usuario->nome, $usuario->id);
     }
 
     public function logout()
@@ -72,9 +80,9 @@ class AuthController extends Controller
         if (!isset($usuario[0]->id))
             return response()->json(['status' => 'erro', 'mensagem' => 'Usuario não localizado.'], 400);
 
-  
+
         $usuarios = Usuarios:: find($usuario[0]->id);
-        $usuarios->tokenAlteracaoSenha =rand(1, 10000);
+        $usuarios->tokenAlteracaoSenha = rand(1, 10000);
 
         if ($usuarios->save()) {
             Mail::to($formData['email'])->send(new Forgot($usuario[0]));
@@ -86,7 +94,7 @@ class AuthController extends Controller
     {
 
         $formData = $request->all();
-        
+
         // return response()->json($formData);
 
         $usuario = Usuarios::where('tokenAlteracaoSenha', '=', $formData['token'])->get();
