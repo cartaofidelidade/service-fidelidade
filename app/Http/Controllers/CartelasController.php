@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cartelas;
 use Illuminate\Http\Request;
 
-class CidadesController extends Controller
+class CartelasController extends Controller
 {
     public function index(Request $request)
     {

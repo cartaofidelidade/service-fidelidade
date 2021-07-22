@@ -12,6 +12,7 @@ if (isset($router)) {
             $router->get("/estados", "EstadosController@index");
             $router->get('/cidades', "CidadesController@index");
             $router->get("/segmentos", "SegmentosController@index");
+            $router->get("/geraQrCode", "EstabelecimentosController@geraQrCode");
         });
 
         $router->group(["prefix" => "estabelecimentos"], function () use ($router) {

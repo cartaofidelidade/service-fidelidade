@@ -36,6 +36,14 @@ class CampanhasController extends Controller
     public function show($id)
     {
         $campanhas = Campanhas::find($id);
+
+        if ($campanhas['imagem_carimbo_preenchido'])
+            $campanhas['imagem_carimbo_preenchido'] = base64_encode(file_get_contents($campanhas['imagem_carimbo_preenchido']));
+
+        if ($campanhas['imagem_carimbo_vazio'])
+            $campanhas['imagem_carimbo_vazio'] = base64_encode(file_get_contents($campanhas['imagem_carimbo_vazio']));
+
+
         return response()->json($campanhas);
     }
 
@@ -120,8 +128,8 @@ class CampanhasController extends Controller
             $campanhas->data_final = $formData['data_final'];
             $campanhas->descricao = $formData['descricao'];
 
-            $campanhas->imagem_carimbo_preenchido = $this->uploadImagem($formData['imagem_carimbo_preenchido']) ?? null;
-            $campanhas->imagem_carimbo_vazio = $this->uploadImagem($formData['imagem_carimbo_vazio']) ?? null;
+            $campanhas->imagem_carimbo_preenchido = $this->uploadArquivo($formData['imagem_carimbo_preenchido']) ?? null;
+            $campanhas->imagem_carimbo_vazio = $this->uploadArquivo($formData['imagem_carimbo_vazio']) ?? null;
 
 
             if ($campanhas->save())
@@ -143,18 +151,26 @@ class CampanhasController extends Controller
             if ($campanhas->save())
                 return response()->json($campanhas);
         } catch (\Throwable $th) {
-            return response()->json(['status', 'erro', 'mensagem' => '', $th], 400);
+            return response()->json(['status', 'erro', 'mensagem' => '', $th->getMessage()], 400);
         }
     }
 
-    private function uploadImagem($file = null, $path = null)
+    public function uploadArquivo(string $arquivo)
     {
-        // if(strpos($file, ';base64')){
-        //     return response()->json(['status' => 'erro', 'mensagem' => 'Regis nunes'], 400);
-            
+        if (strpos($arquivo, ';base64')) {
 
+            $pastaDestino = "carimbos/";
+            $imagem_parts = explode(";base64,", $arquivo);
+            $imagem_type_aux = explode("image/", $imagem_parts[0]);
+            $imagem_type = $imagem_type_aux[1];
+            $imagem_base64 = base64_decode($imagem_parts[1]);
+            $arquivoSalvo = $pastaDestino . uniqid() . '.' . $imagem_type;
+            file_put_contents($arquivoSalvo, $imagem_base64);
 
-        // if (is_null($file) || is_null($path))
-        //     return false;
+            return $formData['logomarca'] = $arquivoSalvo;
+        } else {
+            return response()
+                ->json(['message' => 'Erro ao salvar carimbo'], 400);
+        }
     }
 }
