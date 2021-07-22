@@ -20,8 +20,6 @@ class CidadesController extends Controller
         if (isset($request->id) && !empty($request->id))
             $params['id'] = $request->id;
 
-
-           
         $cidades = Cidades::where($params)->orderBy('nome')->get();
         return response()->json($cidades);
     }

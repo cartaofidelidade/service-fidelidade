@@ -33,7 +33,8 @@ class CreateCampanhas extends Migration
 
             $table->tinyInteger('ativo')->default(1);
 
-            $table->timestamps();
+            $table->timestamp('data_cadastro', 0);
+            $table->timestamp('data_alteracao', 0);
 
             $table->foreignUuid('estabelecimentos_id')->references('id')->on('estabelecimentos');
         });

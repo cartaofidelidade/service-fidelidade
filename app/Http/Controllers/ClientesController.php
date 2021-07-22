@@ -2,111 +2,128 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\BemVindo;
+use App\Models\Clientes;
+use App\Models\Usuarios;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use App\Models\ClientesModel;
-use App\Models\IndividuosModel;
-use App\Models\IndividuosContatosModel;
-use App\Models\IndividuosEnderecosModel;
-use App\Models\UsuariosModel;
 use Illuminate\Support\Facades\DB;
-
-
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 
 class ClientesController extends Controller
 {
 
-    private $data;
-    private $clientesModel;
-    private $individuosModel;
-    private $individuosContatosModel;
-    private $individuosEnderecosModel;
-    private $usuariosModel;
-
-    public function __construct(
-        ClientesModel $clientesModel,
-        IndividuosContatosModel $individuosContatosModel,
-        IndividuosEnderecosModel $individuosEnderecosModel,
-        IndividuosModel $individuosModel,
-        UsuariosModel $UsuariosModel
-    ) {
-        $this->clientesModel = $clientesModel;
-        $this->individuosModel = $individuosModel;
-        $this->individuosEnderecosModel = $individuosEnderecosModel;
-        $this->individuosContatosModel = $individuosContatosModel;
-        $this->usuariosModel = $UsuariosModel;
-    }
-
     public function index($router)
     {
-        return $this->clientesModel->paginate(10);
+
     }
 
-    public function listaClientes($router)
+    public function show($router)
     {
-        $this->data = $this->clientesModel->listaClientes($router);
 
-        if (count($this->data) > 0) {
-            return response()->json($this->data, 200);
-        } else {
-            return response()->json(['erro' => 'Nenhum registro encontro'], 200);
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $formData = $request->all();
+            $validation = Validator::make(
+                $formData,
+                [
+                    'nome' => 'required',
+                    'email' => 'required|email|unique:clientes',
+                ],
+                [
+                    'required' => 'O campo :atribute é obrigatório',
+                    'email' => 'O campo :attribute deve ser um endereço de e-mail válido.',
+                    'unique' => 'O campo :attribute já possui um registro.'
+                ]
+            );
+
+            if ($validation->fails()) {
+                DB::rollBack();
+                return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
+            }
+
+            $clientes = new Clientes();
+
+            $clientes->nome = $formData['nome'];
+            $clientes->email = $formData['email'];
+            $clientes->latitude = $formData['latitude'] ?? null;
+            $clientes->longitude = $formData['longitude'] ?? null;
+
+            if ($clientes->save()) {
+                $usuarios = new Usuarios();
+
+                $usuarios->login = $formData['login'];
+                $usuarios->senha = Hash::make($formData['senha']);
+                $usuarios->origem = 2;
+                $usuarios->origem_id = $clientes->id;
+
+                if ($usuarios->save()) {
+                    DB::commit();
+                    // TODO enviar e-mail de boas vindas para os clientes
+                    // Mail::to($formData['email'])->send(new BemVindo($clientes));
+
+                    return response()->json(['status' => 'ok', 'mesnagem' => 'Cadastro realizado com sucesso.', 'body' => $clientes]);
+                } else {
+                    DB::rollBack();
+                    return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do usuário.'], 400);
+                }
+            } else {
+                DB::rollBack();
+                return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do cliente.'], 400);
+            }
+
+        } catch (\Exception $th) {
+            return response()->json(['status' => 'erro', 'mensagem' => 'Houve um erro inesperado, entre em contato com a equipe de suporte.'], 400);
         }
     }
 
-    public function cadastro(Request $request)
+    public function update(Request $request, $id)
     {
-        DB::beginTransaction();
         try {
+            DB::beginTransaction();
 
-            $this->data = $this->individuosModel->create($request['Individuos']);
+            $formData = $request->all();
+            $validation = Validator::make(
+                $formData,
+                [
+                    'nome' => 'required',
+                    'email' => 'required|email',
+                ],
+                [
+                    'required' => 'O campo :atribute é obrigatório',
+                    'email' => 'O campo :attribute deve ser um endereço de e-mail válido.'
+                ]
+            );
 
-            $contatos = $request['IndividuosContatos'];
-            $contatos['IndividuosId'] = $this->data->Id;
-
-            $this->data['individuosContatos'] = $this->individuosContatosModel->create($contatos);
-
-            if (!$this->data['individuosContatos']->Id) {
-
-                return response()->json('Erro ao cadastrar individuosContatos', 507);
+            if ($validation->fails()) {
+                DB::rollBack();
+                return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
             }
 
-            $enderecos = $request['IndividuosEnderecos'];
-            $enderecos['IndividuosId'] = $this->data->Id;
+            $clientes = Clientes::find($id);
 
-            $this->data['individuosEnderecos'] = $this->individuosEnderecosModel->create($enderecos);
+            $clientes->nome = $formData['nome'];
+            $clientes->email = $formData['email'];
+            $clientes->latitude = $formData['latitude'] ?? null;
+            $clientes->longitude = $formData['longitude'] ?? null;
 
-            if (!$this->data['individuosEnderecos']->Id) {
-
-                return response()->json(['Erro' => 'Não cadastrar individuosEnderecos'], 507);
+            if ($clientes->save()) {
+                DB::commit();
+                return response()->json(['status' => 'ok', 'mesnagem' => 'Cadastro atualizado com sucesso.', 'body' => $clientes]);
             }
 
-            $usuarios = $request['Usuario'];
-            $usuarios['IndividuosId'] = $this->data->Id;
-
-            $this->data['usuarios'] = $this->usuariosModel->create($usuarios);
-
-            if (!$this->data['usuarios']->Id) {
-
-                return response()->json(['erro' => 'Erro ao cadastrar Usuario'], 507);
-            }
-
-            $clientes['IndividuosId'] = $this->data->Id;
-            $clientes['Ativo'] = 1;
-
-            $this->data['usuarios'] = $this->clientesModel->create($clientes);
-
-            if (!$this->data['usuarios']->Id) {
-
-                return response()->json(['erro' => 'Erro ao cadastrar Cliente'], 507);
-            }
-
-            DB::commit();
-
-            return response()->json(['Sucesso' => 'Cliente casdastrado com sucesso'], 201);
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return response()->json(['erro' => 'Erro no banco de dados' . $e], 507);
+            DB::rollBack();
+            return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do cliente.'], 400);
+        } catch (\Exception $th) {
+            return response()->json(['status' => 'erro', 'mensagem' => 'Houve um erro inesperado, entre em contato com a equipe de suporte.'], 400);
         }
     }
 }

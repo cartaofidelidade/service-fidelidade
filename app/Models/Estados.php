@@ -26,4 +26,9 @@ class Estados extends Model
     ];
 
     protected $hidden = [];
+
+    public function cidades()
+    {
+        return $this->hasMany(Cidades::class, 'estados_id', 'id');
+    }
 }

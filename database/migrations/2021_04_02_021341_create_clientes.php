@@ -18,14 +18,14 @@ class CreateClientes extends Migration
 
             $table->string('nome', 100);
             $table->string('email', 100)->unique();
-            $table->string('senha', 100);
 
             $table->string('latitude', 100)->nullable();
             $table->string('longitude', 100)->nullable();
 
             $table->tinyInteger('ativo')->default(1);
 
-            $table->timestamps();
+            $table->timestamp('data_cadastro', 0);
+            $table->timestamp('data_alteracao', 0);
         });
     }
 

@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent;
 use Illuminate\Support\Facades\Storage;
 
 
-
 class EstabelecimentosController extends Controller
 {
 
@@ -77,15 +76,12 @@ class EstabelecimentosController extends Controller
             $estabelecimentos->segmentos_id = $formData['segmentos_id'] ?? null;
 
             if ($estabelecimentos->save()) {
-
                 $usuarios = new Usuarios();
 
                 $usuarios->login = $formData['login'];
                 $usuarios->senha = Hash::make($formData['senha']);
                 $usuarios->origem = 1;
                 $usuarios->origem_id = $estabelecimentos->id;
-
-
 
                 if ($usuarios->save()) {
                     DB::commit();
@@ -107,11 +103,11 @@ class EstabelecimentosController extends Controller
 
     public function update(Request $request)
     {
-
         try {
-
             $estabelecimento = Auth::user();
+
             $formData = $request->all();
+
             $validation = Validator::make(
                 $formData,
                 [
@@ -119,8 +115,8 @@ class EstabelecimentosController extends Controller
                     'email' => 'required|email',
                     'documento' => 'required',
                     'segmentos_id' => 'required',
-                    // 'estados_id' => 'required',
-                    // 'cidades_id' => 'required',
+                    'estados_id' => 'required',
+                    'cidades_id' => 'required'
                 ],
                 [
                     'required' => 'O campo :atribute é obrigatório',

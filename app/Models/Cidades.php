@@ -26,4 +26,8 @@ class Cidades extends Model
     ];
 
     protected $hidden = [];
+
+    public function estado(){
+        return $this->belongsTo(Estados::class, 'estados_id');
+    }
 }

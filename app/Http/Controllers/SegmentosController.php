@@ -42,7 +42,7 @@ class SegmentosController extends Controller
         $segmento->nome = $formData['nome'];
 
         if ($segmento->save())
-            return response()->json($segmento);
+            return response()->json(['status' => 'ok', 'mesnagem' => 'Cadastro realizado com sucesso.', 'body' => $segmento]);
 
         return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro.'], 400);
     }

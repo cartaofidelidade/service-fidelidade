@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSegmentos extends Migration
+class CreateTokens extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class CreateSegmentos extends Migration
      */
     public function up()
     {
-        Schema::create('segmentos', function (Blueprint $table) {
+        Schema::create('tokens', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('nome', 100);
+
+            $table->uuid('token');
+            $table->smallInteger('origem')->default(1)->comment('1 - estabelecimento, 2 - cliente, 3 - Gerenciador');
 
             $table->tinyInteger('ativo')->default(1);
 
@@ -31,6 +33,6 @@ class CreateSegmentos extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('segmentos');
+        Schema::dropIfExists('tokens');
     }
 }

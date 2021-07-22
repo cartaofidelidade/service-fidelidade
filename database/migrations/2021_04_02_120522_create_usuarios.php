@@ -16,13 +16,15 @@ class CreateUsuarios extends Migration
         Schema::create('usuarios', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            $table->smallInteger('origem')->default(1)->comment('1 - estabelecimento, 2 - cliente');
+            $table->smallInteger('origem')->default(1)->comment('1 - estabelecimento, 2 - cliente, 3 - Gerenciador');
             $table->uuid('origem_id');
-            $table->string('login', 100);
+            $table->string('login', 100)->unique();
             $table->string('senha', 100);
 
             $table->tinyInteger('ativo')->default(1);
-            $table->timestamps();
+
+            $table->timestamp('data_cadastro', 0);
+            $table->timestamp('data_alteracao', 0);
         });
     }
 

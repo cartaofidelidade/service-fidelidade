@@ -20,7 +20,7 @@ class CreateEstabelecimentos extends Migration
             $table->string('nome', 100);
             $table->string('nome_fantasia', 100)->nullable();
             $table->string('documento', 20)->unique();
-            
+
             $table->string('email', 100)->unique();
             $table->string('celular', 15)->nullable();
             $table->string('telefone', 15)->nullable();
@@ -40,9 +40,8 @@ class CreateEstabelecimentos extends Migration
 
             $table->tinyInteger('ativo')->default(1)->nullable();
 
-            $table->timestamps();
-            
-            
+            $table->timestamp('data_cadastro', 0);
+            $table->timestamp('data_alteracao', 0);
 
             $table->foreignUuid('estados_id')->references('id')->on('estados');
             $table->foreignUuid('cidades_id')->references('id')->on('cidades');
