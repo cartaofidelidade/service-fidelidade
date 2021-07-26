@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent;
 use Illuminate\Support\Facades\Storage;
 
+use  LaravelQRCode\Facades\QRCode;
+
 
 class EstabelecimentosController extends Controller
 {
@@ -97,7 +99,7 @@ class EstabelecimentosController extends Controller
                 return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do estabelecimento.'], 400);
             }
         } catch (\Throwable $th) {
-            return response()->json(['status' => 'erro', 'mensagem' => $th], 400);
+            return response()->json(['status' => 'erro', 'mensagem' => $th->getMessage()], 400);
         }
     }
 
@@ -186,5 +188,31 @@ class EstabelecimentosController extends Controller
             return response()
                 ->json(['message' => 'Erro ao salvar logomarca'], 400);
         }
+    }
+
+    public function geraQrCode()
+    {
+
+        // $pastaDestino = "logo-marca/";
+        // $arquivoSalvo = $pastaDestino . uniqid() . '.' . 'jpg';
+        // file_put_contents($arquivoSalvo, QRCode::url('werneckbh.github.io/qr-code/')
+        //     ->setSize(8)
+        //     ->setMargin(2)
+        //     ->svg());
+
+        // dd('sadas');
+        dd(QRCode::urlddd('werneckbh.github.io/qr-code/')
+            ->setSize(8)
+            ->setMargin(2)
+            ->svg());
+
+
+        dd(file_get_contents(QRCode::url('werneckbh.github.io/qr-code/')
+            ->setSize(8)
+            ->setMargin(2)
+            ->svg()));
+
+
+        return  QRCode::text('Laravel QR Code Generator!')->png();
     }
 }

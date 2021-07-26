@@ -84,14 +84,14 @@ class CampanhasController extends Controller
             $campanhas->data_final = $formData['data_final'];
             $campanhas->descricao = $formData['descricao'];
 
-            $campanhas->imagem_carimbo_preenchido = $this->uploadImagem($formData['imagem_carimbo_preenchido']) ?? null;
-            $campanhas->imagem_carimbo_vazio = $this->uploadImagem($formData['imagem_carimbo_vazio']) ?? null;
+            $campanhas->imagem_carimbo_preenchido = $this->uploadArquivo($formData['imagem_carimbo_preenchido']) ?? null;
+            $campanhas->imagem_carimbo_vazio = $this->uploadArquivo($formData['imagem_carimbo_vazio']) ?? null;
 
             if ($campanhas->save())
                 return response()->json($campanhas);
             return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível cadastrar a campanha.'], 400);
         } catch (\Throwable $th) {
-            return response()->json(['status' => 'erro', 'mesnagem' => $th], 400);
+            return response()->json(['status' => 'erro', 'mesnagem' => $th->getMessage()], 400);
         }
     }
 
@@ -137,7 +137,7 @@ class CampanhasController extends Controller
 
             return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível cadastrar a campanha.'], 400);
         } catch (\Throwable $th) {
-            return response()->json(['status' => 'erro', 'mensagem' => $th], 400);
+            return response()->json(['status' => 'erro', 'mensagem' => $th->getMessage()], 400);
         }
     }
 

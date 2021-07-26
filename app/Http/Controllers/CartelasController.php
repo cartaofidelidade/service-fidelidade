@@ -28,10 +28,45 @@ class CartelasController extends Controller
 
     public function store(Request $request)
     {
-        $cartela = new Cartelas();
+        
+        try {
 
-        $cartela->campanhas_id = '';
-        $cartela->clientes_id = '';
+            $cliente = Auth::user();
+            $formData = $request->all();
+
+            // $validation = Validator::make(
+            //     $formData,
+            //     [
+            //         'nome' => 'required',
+            //         'tipo' => 'required',
+            //         'data_inicio' => 'required',
+            //         'data_final' => 'required'
+            //     ],
+            //     [
+            //         'required' => 'O campo :atribute é obrigatório'
+            //     ]
+            // );
+
+
+
+            // if ($validation->fails())
+            //     return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
+
+            $cartelas = new Cartelas();
+
+            $cartelas->campanhas_id = $cliente->clientes_id;
+            $cartelas->clientes_id = $formData['campanhas_id'];
+
+
+
+
+
+            if ($cartelas->save())
+                return response()->json($cartelas);
+            return response()->json(['status' => 'erro', 'mesnagem' => 'Não adicionar carimbo.'], 400);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => 'erro', 'mesnagem' => $th->getMessage()], 400);
+        }
 
     }
 

@@ -103,6 +103,21 @@ $app->register(Fruitcake\Cors\CorsServiceProvider::class);
 
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
+
+$app->register(LaravelQRCode\Providers\QRCodeServiceProvider::class);
+
+$app->alias('QRCode', LaravelQRCode\Facades\QRCode::class);
+
+// aliases
+
+// 'providers' => [     
+      
+//     LaravelQRCode\Providers\QRCodeServiceProvider::class,     
+  
+// ],
+
+
+
 // $app->register(App\Providers\EventServiceProvider::class);
 
 $app->singleton('filesystem', function ($app) {
