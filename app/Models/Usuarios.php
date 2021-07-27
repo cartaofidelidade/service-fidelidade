@@ -16,8 +16,8 @@ class Usuarios extends Model implements AuthenticatableContract,  AuthorizableCo
     use Authenticatable, Authorizable, HasFactory;
     use Uuid;
 
-    // const CREATED_AT = "data_cadastro";
-    // const UPDATED_AT = "data_alteracao";
+    const CREATED_AT = "data_cadastro";
+    const UPDATED_AT = "data_alteracao";
 
     protected $table = "usuarios";
 

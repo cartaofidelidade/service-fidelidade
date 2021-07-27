@@ -16,10 +16,11 @@ class CreateEstabelecimentos extends Migration
         Schema::create('estabelecimentos', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            $table->tinyInteger('tipo_pessoa')->default(1)->comment('1 física, 2 jurídica');
-            $table->string('nome', 100);
+            $table->tinyInteger('tipo_pessoa')->default(2)->comment('1 física, 2 jurídica');
+
+            $table->string('nome', 100)->nullable();
             $table->string('nome_fantasia', 100)->nullable();
-            $table->string('documento', 20)->unique();
+            $table->string('documento', 20)->nullable();
 
             $table->string('email', 100)->unique();
             $table->string('celular', 15)->nullable();
