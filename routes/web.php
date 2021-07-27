@@ -48,8 +48,6 @@ if (isset($router)) {
                 $router->get('/consultar', 'CampanhasController@index');
                 $router->get('/buscaCampanha/{id}', 'CampanhasController@show');
 
-
-
                 $router->post('/cadastro', 'CampanhasController@store');
                 $router->post('/editar/{id}', 'CampanhasController@update');
                 $router->post('delete/{id}', 'CampanhasController@delete');

@@ -36,14 +36,13 @@ class EstabelecimentosController extends Controller
             $validation = Validator::make(
                 $formData,
                 [
-                    'nome' => 'required',
+                    'nome_fantasia' => 'required',
                     'email' => 'required|email|unique:estabelecimentos',
-                    'documento' => 'required|unique:estabelecimentos',
                     'login' => 'required|unique:usuarios',
                     'senha' => 'required|min:6',
                 ],
                 [
-                    'required' => 'O campo :atribute é obrigatório',
+                    'required' => 'O campo :attribute é obrigatório',
                     'email' => 'O campo :attribute deve ser um endereço de e-mail válido.',
                     'unique' => 'O campo :attribute já possui um registro.',
                     'min' => 'O campo :attribute deve ser pelo menos :min caracteres.'
@@ -57,10 +56,10 @@ class EstabelecimentosController extends Controller
 
             $estabelecimentos = new Estabelecimentos();
 
-            $estabelecimentos->tipo_pessoa = $formData['tipo_pessoa'];
-            $estabelecimentos->nome = $formData['nome'];
+            $estabelecimentos->tipo_pessoa = $formData['tipo_pessoa'] ?? 2;
+            $estabelecimentos->nome = $formData['nome'] ?? null;
             $estabelecimentos->nome_fantasia = $formData['nome_fantasia'] ?? null;
-            $estabelecimentos->documento = $formData['documento'];
+            $estabelecimentos->documento = $formData['documento'] ?? null;
             $estabelecimentos->email = $formData['email'];
             $estabelecimentos->celular = $formData['celular'] ?? null;
             $estabelecimentos->telefone = $formData['telefone'] ?? null;
