@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Cartelas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Campanhas;
+
 
 class CartelasController extends Controller
 {
@@ -21,57 +24,50 @@ class CartelasController extends Controller
             $params['id'] = $request->id;
 
 
-           
-        $cidades = Cartelas::where($params)->orderBy('nome')->get();
-        return response()->json($cidades);
+
+        $cartelas = Cartelas::where($params)->orderBy('nome')->get();
+        return response()->json($cartelas);
     }
 
     public function store(Request $request)
     {
-        
+
         try {
 
             $cliente = Auth::user();
             $formData = $request->all();
 
-            // $validation = Validator::make(
-            //     $formData,
-            //     [
-            //         'nome' => 'required',
-            //         'tipo' => 'required',
-            //         'data_inicio' => 'required',
-            //         'data_final' => 'required'
-            //     ],
-            //     [
-            //         'required' => 'O campo :atribute é obrigatório'
-            //     ]
-            // );
-
-
-
-            // if ($validation->fails())
-            //     return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
-
             $cartelas = new Cartelas();
 
-            $cartelas->campanhas_id = $cliente->clientes_id;
-            $cartelas->clientes_id = $formData['campanhas_id'];
+            $cartelas->campanhas_id = $formData['campanhas_id'];
+            $cartelas->clientes_id = $formData['clientes_id'];
 
-
-
+            if ($this->validaCarimbos($formData['campanhas_id']))
+                return response()->json(['status' => 'erro', 'mensagem' => 'Limite diario atingido.'], 400);
 
 
             if ($cartelas->save())
                 return response()->json($cartelas);
-            return response()->json(['status' => 'erro', 'mesnagem' => 'Não adicionar carimbo.'], 400);
-        } catch (\Throwable $th) {
-            return response()->json(['status' => 'erro', 'mesnagem' => $th->getMessage()], 400);
-        }
 
+            return response()->json(['status' => 'erro', 'mensagem' => 'Não adicionar carimbo.'], 400);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => 'erro', 'mensagem' => $th->getMessage()], 400);
+        }
     }
 
-    public function validaCarimbos()
+    public function validaCarimbos($id)
     {
-        # code...
+        $campanhas = Campanhas::find($id);
+
+        $cartelas = Cartelas::where('clientes_id', '<=', '07527786-8dea-46b3-8490-27b5171f94c8')
+            ->where('campanhas_id', '<=', $id)
+            ->whereDate('created_at', date('Y-m-d'))
+            // ->whereDate('data_cadastro', date('Y-m-d'))
+            ->get();
+
+        if ($campanhas->limite_carimbos_dia < $cartelas->count())
+            return true;
+
+        return false;
     }
 }

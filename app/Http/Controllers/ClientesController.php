@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\BemVindo;
+use App\Mail\BemVindoClientes;
 use App\Models\Clientes;
 use App\Models\Usuarios;
 use Illuminate\Database\Eloquent\Model;
@@ -18,17 +18,16 @@ class ClientesController extends Controller
 
     public function index($router)
     {
-
     }
 
     public function show($router)
     {
-
     }
 
     public function store(Request $request)
     {
         try {
+
             DB::beginTransaction();
 
             $formData = $request->all();
@@ -67,21 +66,21 @@ class ClientesController extends Controller
 
                 if ($usuarios->save()) {
                     DB::commit();
-                    // TODO enviar e-mail de boas vindas para os clientes
-                    // Mail::to($formData['email'])->send(new BemVindo($clientes));
+                  
+                    Mail::to($formData['email'])->send(new BemVindoClientes($clientes));
 
-                    return response()->json(['status' => 'ok', 'mesnagem' => 'Cadastro realizado com sucesso.', 'body' => $clientes]);
+                    return response()->json(['status' => 'ok', 'mensagem' => 'Cadastro realizado com sucesso.', 'body' => $clientes]);
                 } else {
                     DB::rollBack();
-                    return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do usuário.'], 400);
+                    return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível realizar o cadastro do usuário.'], 400);
                 }
             } else {
                 DB::rollBack();
-                return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do cliente.'], 400);
+                return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível realizar o cadastro do cliente.'], 400);
             }
-
         } catch (\Exception $th) {
             return response()->json(['status' => 'erro', 'mensagem' => 'Houve um erro inesperado, entre em contato com a equipe de suporte.'], 400);
+        
         }
     }
 
@@ -117,11 +116,11 @@ class ClientesController extends Controller
 
             if ($clientes->save()) {
                 DB::commit();
-                return response()->json(['status' => 'ok', 'mesnagem' => 'Cadastro atualizado com sucesso.', 'body' => $clientes]);
+                return response()->json(['status' => 'ok', 'mensagem' => 'Cadastro atualizado com sucesso.', 'body' => $clientes]);
             }
 
             DB::rollBack();
-            return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do cliente.'], 400);
+            return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível realizar o cadastro do cliente.'], 400);
         } catch (\Exception $th) {
             return response()->json(['status' => 'erro', 'mensagem' => 'Houve um erro inesperado, entre em contato com a equipe de suporte.'], 400);
         }

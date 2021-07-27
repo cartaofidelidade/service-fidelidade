@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Estabelecimentos;
-use App\Mail\BemVindo;
+use App\Mail\BemVindoEstabelecimentos;
 
 use App\Models\Usuarios;
 use Illuminate\Http\Request;
@@ -87,7 +87,7 @@ class EstabelecimentosController extends Controller
 
                 if ($usuarios->save()) {
                     DB::commit();
-                    Mail::to($formData['email'])->send(new BemVindo($estabelecimentos));
+                    Mail::to($formData['email'])->send(new BemVindoEstabelecimentos($estabelecimentos));
 
                     return response()->json($estabelecimentos);
                 } else {
