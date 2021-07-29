@@ -44,9 +44,13 @@ class CreateEstabelecimentos extends Migration
             $table->timestamp('data_cadastro', 0);
             $table->timestamp('data_alteracao', 0);
 
-            $table->foreignUuid('estados_id')->references('id')->on('estados');
-            $table->foreignUuid('cidades_id')->references('id')->on('cidades');
-            $table->foreignUuid('segmentos_id')->references('id')->on('segmentos');
+            $table->uuid('estados_id')->nullable();
+            $table->uuid('cidades_id')->nullable();
+            $table->uuid('segmentos_id')->nullable();
+
+            $table->foreign('estados_id')->references('id')->on('estados');
+            $table->foreign('cidades_id')->references('id')->on('cidades');
+            $table->foreign('segmentos_id')->references('id')->on('segmentos');
         });
     }
 

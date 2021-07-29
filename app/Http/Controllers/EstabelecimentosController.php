@@ -12,9 +12,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Database\Eloquent;
-use Illuminate\Support\Facades\Storage;
-
 use  LaravelQRCode\Facades\QRCode;
 
 
@@ -29,10 +26,10 @@ class EstabelecimentosController extends Controller
     public function store(Request $request)
     {
 
-        try {
-            DB::beginTransaction();
 
+        $res = DB::transaction(function () use ($request) {
             $formData = $request->all();
+
             $validation = Validator::make(
                 $formData,
                 [
@@ -51,29 +48,13 @@ class EstabelecimentosController extends Controller
 
             if ($validation->fails()) {
                 DB::rollBack();
-                return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
+                return ['status' => 'erro', 'mensagem' => $validation->errors()->first()];
             }
 
             $estabelecimentos = new Estabelecimentos();
 
-            $estabelecimentos->tipo_pessoa = $formData['tipo_pessoa'] ?? 2;
-            $estabelecimentos->nome = $formData['nome'] ?? null;
             $estabelecimentos->nome_fantasia = $formData['nome_fantasia'] ?? null;
-            $estabelecimentos->documento = $formData['documento'] ?? null;
             $estabelecimentos->email = $formData['email'];
-            $estabelecimentos->celular = $formData['celular'] ?? null;
-            $estabelecimentos->telefone = $formData['telefone'] ?? null;
-            $estabelecimentos->facebook = $formData['facebook'] ?? null;
-            $estabelecimentos->instagram = $formData['instagram'] ?? null;
-            $estabelecimentos->site = $formData['site'] ?? null;
-            $estabelecimentos->cep = $formData['cep'] ?? null;
-            $estabelecimentos->logradouro = $formData['logradouro'] ?? null;
-            $estabelecimentos->numero = $formData['numero'] ?? null;
-            $estabelecimentos->complemento = $formData['complemento'] ?? null;
-            $estabelecimentos->bairro = $formData['bairro'] ?? null;
-            $estabelecimentos->logomarca = $formData['logomarca'] ?? null;
-            $estabelecimentos->estados_id = $formData['estados_id'] ?? null;
-            $estabelecimentos->cidades_id = $formData['cidades_id'] ?? null;
             $estabelecimentos->segmentos_id = $formData['segmentos_id'] ?? null;
 
             if ($estabelecimentos->save()) {
@@ -86,20 +67,20 @@ class EstabelecimentosController extends Controller
 
                 if ($usuarios->save()) {
                     DB::commit();
-                    Mail::to($formData['email'])->send(new BemVindoEstabelecimentos($estabelecimentos));
+                    // Mail::to($formData['email'])->send(new BemVindoEstabelecimentos($estabelecimentos));
 
-                    return response()->json($estabelecimentos);
+                    return ['status' => 'ok', 'mensagem' => 'Cadastro realizado com sucesso', 'body' => $estabelecimentos];
                 } else {
                     DB::rollBack();
-                    return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do usuário.'], 400);
+                    return ['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do usuário.'];
                 }
             } else {
                 DB::rollBack();
-                return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do estabelecimento.'], 400);
+                return ['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do estabelecimento.'];
             }
-        } catch (\Throwable $th) {
-            return response()->json(['status' => 'erro', 'mensagem' => $th->getMessage()], 400);
-        }
+        });
+
+        return response()->json($res, ($res['status'] === 'erro' ? 400 : 200));
     }
 
     public function update(Request $request)
@@ -212,6 +193,6 @@ class EstabelecimentosController extends Controller
             ->svg()));
 
 
-        return  QRCode::text('Laravel QR Code Generator!')->png();
+        return QRCode::text('Laravel QR Code Generator!')->png();
     }
 }

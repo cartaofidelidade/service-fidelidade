@@ -35,19 +35,19 @@ class AuthController extends Controller
             return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
 
         $token = Auth::attempt(['login' => $data['login'], 'password' => $data['senha']]);
-
         if (!$token)
             return response()->json(['status' => 'erro', 'mensagem' => 'Os dados de Login e ou Senha estão inválidos.'], 400);
 
         $origem = Auth::user()->origem;
 
-        $usuario = Estabelecimentos::find(Auth::user()->origem_id);
-
-        if ((int)$origem === 2)
+        if ((int)$origem === 11)
+            $usuario = Estabelecimentos::find(Auth::user()->origem_id);
+        else if ((int)$origem === 2)
             $usuario = Clientes::find(Auth::user()->origem_id);
+        else
+            $usuario = [];
 
-
-        return $this->respondWithToken($token, $usuario->nome, $usuario->id);
+        return response()->json(['status' => 'ok', 'token' => $token, 'usuario' => $usuario['nome'], 'id' => $usuario['id']]);
     }
 
     public function logout()
@@ -59,16 +59,6 @@ class AuthController extends Controller
     public function username()
     {
         return 'login';
-    }
-
-    protected function respondWithToken($token, $usuario, $id)
-    {
-        return response()->json([
-            'status' => 'ok',
-            'token' => $token,
-            'usuario' => $usuario,
-            'id' => $id
-        ]);
     }
 
     public function recuperarSenha(Request $request)

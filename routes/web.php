@@ -23,22 +23,16 @@ if (isset($router)) {
 
             $router->group(["prefix" =>"cartelas"], function() use ($router){
                 $router->post('/cadastro','CartelasController@store');
-
             });
-
         });
 
         $router->group(["prefix" => "estabelecimentos"], function () use ($router) {
             $router->group(["prefix" => "conta"], function () use ($router) {
                 $router->post("/login", "AuthController@authEstabelecimento");
-                $router->post("/logout", "AuthController@logout");
-
+                $router->post("/sair", "AuthController@logout");
 
                 $router->post("/recuperarSenha", "AuthController@recuperarSenha");
                 $router->post("/alterarSenha", "AuthController@alterarSenha");
-
-                $router->get('/buscaEstabelecimento/{id}', 'EstabelecimentosController@buscaEstabelecimento');
-
 
                 $router->post("/cadastro", "EstabelecimentosController@store");
                 $router->post("/editar", "EstabelecimentosController@update");
