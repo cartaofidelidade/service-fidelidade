@@ -28,7 +28,7 @@ if (isset($router)) {
 
         $router->group(["prefix" => "estabelecimentos"], function () use ($router) {
             $router->group(["prefix" => "conta"], function () use ($router) {
-                $router->post("/login", "AuthController@authEstabelecimento");
+                $router->post("/login", "AuthController@auth");
                 $router->post("/sair", "AuthController@logout");
 
                 $router->post("/recuperarSenha", "AuthController@recuperarSenha");
