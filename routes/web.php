@@ -7,7 +7,7 @@ if (isset($router)) {
         return response()->json(['mensagem' => 'API Fidelidade'], 200);
     });
 
-    $router->group(['prefix' => "api"], function () use ($router) {
+    $router->group(['prefix' => "api", "middleware" => "token"], function () use ($router) {
         $router->group(["prefix" => "publica"], function () use ($router) {
             $router->get("/estados", "EstadosController@index");
             $router->get('/cidades', "CidadesController@index");
@@ -15,14 +15,14 @@ if (isset($router)) {
             $router->get("/geraQrCode", "EstabelecimentosController@geraQrCode");
         });
 
-        $router->group(["prefix" =>"clientes"], function () use ($router){
-            $router->group(["prefix"=> "conta"], function () use ($router){
-                $router->post('/cadastro','ClientesController@store');
+        $router->group(["prefix" => "clientes"], function () use ($router) {
+            $router->group(["prefix" => "conta"], function () use ($router) {
+                $router->post('/cadastro', 'ClientesController@store');
                 $router->put("/editar/{id}", "ClientesController@update");
             });
 
-            $router->group(["prefix" =>"cartelas"], function() use ($router){
-                $router->post('/cadastro','CartelasController@store');
+            $router->group(["prefix" => "cartelas"], function () use ($router) {
+                $router->post('/cadastro', 'CartelasController@store');
             });
         });
 

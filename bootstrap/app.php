@@ -82,7 +82,8 @@ $app->middleware([Fruitcake\Cors\HandleCors::class]);
 // ]);
 
 $app->routeMiddleware([
-    'auth' => App\Http\Middleware\Authenticate::class
+    'auth' => App\Http\Middleware\Authenticate::class,
+    'token' => App\Http\Middleware\TokenMiddleware::class
 ]);
 
 /*
@@ -111,9 +112,9 @@ $app->alias('QRCode', LaravelQRCode\Facades\QRCode::class);
 // aliases
 
 // 'providers' => [     
-      
+
 //     LaravelQRCode\Providers\QRCodeServiceProvider::class,     
-  
+
 // ],
 
 
