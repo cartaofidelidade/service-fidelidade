@@ -61,6 +61,10 @@ class AuthController extends Controller
         return 'login';
     }
 
+    public function register()
+    {
+    }
+
     public function recuperarSenha(Request $request)
     {
         $formData = $request->all();
@@ -71,7 +75,7 @@ class AuthController extends Controller
             return response()->json(['status' => 'erro', 'mensagem' => 'Usuario não localizado.'], 400);
 
 
-        $usuarios = Usuarios:: find($usuario[0]->id);
+        $usuarios = Usuarios::find($usuario[0]->id);
         $usuarios->tokenAlteracaoSenha = rand(1, 10000);
 
         if ($usuarios->save()) {
@@ -93,7 +97,7 @@ class AuthController extends Controller
             return response()->json(['status' => 'erro', 'mensagem' => 'Usuario não localizado.'], 400);
 
 
-        $usuarios = Usuarios:: find($usuario[0]->id);
+        $usuarios = Usuarios::find($usuario[0]->id);
         $usuarios->senha = Hash::make($formData['senha']);
         $usuarios->tokenAlteracaoSenha = null;
 

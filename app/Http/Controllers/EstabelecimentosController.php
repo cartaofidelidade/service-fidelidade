@@ -18,15 +18,8 @@ use  LaravelQRCode\Facades\QRCode;
 class EstabelecimentosController extends Controller
 {
 
-    public function __construct()
-    {
-        // $this->middleware('auth', ['except' => ['store']]);
-    }
-
     public function store(Request $request)
     {
-
-
         $res = DB::transaction(function () use ($request) {
             $formData = $request->all();
 
