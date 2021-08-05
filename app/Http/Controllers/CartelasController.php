@@ -10,22 +10,29 @@ use App\Models\Campanhas;
 
 class CartelasController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => ['store']]);
+    }
+
     public function index(Request $request)
     {
         $params = [];
 
-        if (isset($request->nome) && !empty($request->nome))
-            $params['nome'] = $request->nome;
 
-        if (isset($request->estadoId) && !empty($request->estadoId))
-            $params['estados_id'] = $request->estadoId;
+        if (isset($request->estadoId) && !empty($request->campanhas_id))
+            $params['campanhas_id'] = $request->estadoId;
+
+        if (isset($request->estadoId) && !empty($request->clientes_id))
+            $params['clientes_id'] = $request->clientes_id;
 
         if (isset($request->id) && !empty($request->id))
             $params['id'] = $request->id;
 
 
 
-        $cartelas = Cartelas::where($params)->orderBy('nome')->get();
+        $cartelas = Cartelas::where($params)->get();
         return response()->json($cartelas);
     }
 
@@ -57,7 +64,9 @@ class CartelasController extends Controller
 
     public function validaCarimbos($id)
     {
+
         $campanhas = Campanhas::find($id);
+        $cliente = Auth::user();
 
         $cartelas = Cartelas::where('clientes_id', '<=', '07527786-8dea-46b3-8490-27b5171f94c8')
             ->where('campanhas_id', '<=', $id)

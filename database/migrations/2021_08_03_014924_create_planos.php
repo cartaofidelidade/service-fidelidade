@@ -26,8 +26,8 @@ class CreatePlanos extends Migration
 
             $table->tinyInteger('ativo')->default(1);
 
-            $table->timestamp('data_cadastro', 0);
-            $table->timestamp('data_alteracao', 0);
+            $table->timestamp('data_cadastro')->useCurrent();
+            $table->timestamp('data_alteracao')->useCurrent();
 
             $table->foreignUuid('produtos_id')->references('id')->on('produtos');
         });

@@ -52,6 +52,8 @@ class CampanhasController extends Controller
 
         try {
             $estabelecimento = Auth::user();
+
+            // dd( $estabelecimento);
             $formData = $request->all();
 
             $validation = Validator::make(
@@ -84,14 +86,16 @@ class CampanhasController extends Controller
             $campanhas->data_final = $formData['data_final'];
             $campanhas->descricao = $formData['descricao'];
 
-            $campanhas->imagem_carimbo_preenchido = $this->uploadArquivo($formData['imagem_carimbo_preenchido']) ?? null;
-            $campanhas->imagem_carimbo_vazio = $this->uploadArquivo($formData['imagem_carimbo_vazio']) ?? null;
+            // $campanhas->imagem_carimbo_preenchido = $this->uploadArquivo($formData['imagem_carimbo_preenchido']) ?? null;
+            // $campanhas->imagem_carimbo_vazio = $this->uploadArquivo($formData['imagem_carimbo_vazio']) ?? null;
+
+            // dd($campanhas);
 
             if ($campanhas->save())
                 return response()->json($campanhas);
-            return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível cadastrar a campanha.'], 400);
+            return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível cadastrar a campanha.'], 400);
         } catch (\Throwable $th) {
-            return response()->json(['status' => 'erro', 'mesnagem' => $th->getMessage()], 400);
+            return response()->json(['status' => 'erro', 'mensagemss' => $th->getMessage()], 400);
         }
     }
 
@@ -131,6 +135,8 @@ class CampanhasController extends Controller
             $campanhas->imagem_carimbo_preenchido = $this->uploadArquivo($formData['imagem_carimbo_preenchido']) ?? null;
             $campanhas->imagem_carimbo_vazio = $this->uploadArquivo($formData['imagem_carimbo_vazio']) ?? null;
 
+
+            dd($campanhas);
 
             if ($campanhas->save())
                 return response()->json($campanhas);

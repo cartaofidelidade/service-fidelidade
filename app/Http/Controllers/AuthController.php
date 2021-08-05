@@ -18,6 +18,8 @@ class AuthController extends Controller
 
     public function auth(Request $request)
     {
+
+
         $data = $request->only('login', 'senha');
 
         $validation = Validator::make(
@@ -40,14 +42,18 @@ class AuthController extends Controller
 
         $origem = Auth::user()->origem;
 
-        if ((int)$origem === 11)
+        if ((int)$origem === 1) {
             $usuario = Estabelecimentos::find(Auth::user()->origem_id);
-        else if ((int)$origem === 2)
+        
+        } else if ((int)$origem === 2) {
             $usuario = Clientes::find(Auth::user()->origem_id);
-        else
+      
+        } else {
             $usuario = [];
+        }
 
-        return response()->json(['status' => 'ok', 'token' => $token, 'usuario' => $usuario['nome'], 'id' => $usuario['id']]);
+
+        return response()->json(['status' => 'ok', 'token' => $token, 'usuario' => $usuario['nome'] ?? $usuario['nome_fantasia'], 'id' => $usuario['id']]);
     }
 
     public function logout()
