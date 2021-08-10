@@ -18,8 +18,6 @@ class AuthController extends Controller
 
     public function auth(Request $request)
     {
-
-
         $data = $request->only('login', 'senha');
 
         $validation = Validator::make(
@@ -37,23 +35,21 @@ class AuthController extends Controller
             return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
 
         $token = Auth::attempt(['login' => $data['login'], 'password' => $data['senha']]);
+        
         if (!$token)
             return response()->json(['status' => 'erro', 'mensagem' => 'Os dados de Login e ou Senha estão inválidos.'], 400);
 
         $origem = Auth::user()->origem;
 
+        $usuario = [];
+
         if ((int)$origem === 1) {
             $usuario = Estabelecimentos::find(Auth::user()->origem_id);
-        
         } else if ((int)$origem === 2) {
             $usuario = Clientes::find(Auth::user()->origem_id);
-      
-        } else {
-            $usuario = [];
         }
 
-
-        return response()->json(['status' => 'ok', 'token' => $token, 'usuario' => $usuario['nome'] ?? $usuario['nome_fantasia'], 'id' => $usuario['id']]);
+        return response()->json(['status' => 'ok', 'token' => $token, 'nome' => $usuario['nome'] ?? $usuario['nome_fantasia'], 'id' => $usuario['id']]);
     }
 
     public function logout()
@@ -67,19 +63,23 @@ class AuthController extends Controller
         return 'login';
     }
 
-    public function register()
+    public function register(Request $request)
     {
+        $register = [];
+
+        if ((int)$request->origem === 1)
+            $register = (new EstabelecimentosController())->store($request->all());
+
+        return response()->json($register, ($register['status'] === 'erro' ? 400 : 200));
     }
 
-    public function recuperarSenha(Request $request)
+    public function forgot(Request $request)
     {
         $formData = $request->all();
         $usuario = Usuarios::where('login', '=', $formData['email'])->get();
 
-
         if (!isset($usuario[0]->id))
             return response()->json(['status' => 'erro', 'mensagem' => 'Usuario não localizado.'], 400);
-
 
         $usuarios = Usuarios::find($usuario[0]->id);
         $usuarios->tokenAlteracaoSenha = rand(1, 10000);
@@ -90,12 +90,10 @@ class AuthController extends Controller
         }
     }
 
-    public function alterarSenha(Request $request)
+    public function changePassword(Request $request)
     {
 
         $formData = $request->all();
-
-        // return response()->json($formData);
 
         $usuario = Usuarios::where('tokenAlteracaoSenha', '=', $formData['token'])->get();
 
@@ -108,7 +106,6 @@ class AuthController extends Controller
         $usuarios->tokenAlteracaoSenha = null;
 
         if ($usuarios->save()) {
-            // DB::commit();
             return response()->json($usuarios);
         }
     }

@@ -7,12 +7,11 @@ if (isset($router)) {
         return response()->json(['mensagem' => 'API Fidelidade'], 200);
     });
 
-    // $router->group(['prefix' => "api", "middleware" => "token"], function () use ($router) {
     $router->group(['prefix' => "api"], function () use ($router) {
         $router->group(["prefix" => "publica"], function () use ($router) {
             $router->get("/estados", "EstadosController@index");
             $router->get('/cidades', "CidadesController@index");
-            $router->get("/segmentos", "SegmentosController@index");            
+            $router->get("/segmentos", "SegmentosController@index");
             $router->get("/geraQrCode", "EstabelecimentosController@geraQrCode");
         });
 
@@ -27,18 +26,24 @@ if (isset($router)) {
             });
         });
 
-        $router->group(['prefix' => "conta"], function () use ($router) {
+        $router->group(["prefix" => "conta", "middleware" => 'token'], function () use ($router) {
             $router->post("/login", "AuthController@auth");
             $router->post("/sair", "AuthController@logout");
-            $router->post('/cadastro', 'ClientesController@store');
+
+            $router->post('/cadastro', 'AuthController@register');
+
             $router->post("/recuperarSenha", "AuthController@recuperarSenha");
-            $router->post("/alterarSenha", "AuthController@alterarSenha");  
+            $router->post("/alterarSenha", "AuthController@alterarSenha");
         });
 
         $router->group(["prefix" => "estabelecimentos"], function () use ($router) {
             $router->group(["prefix" => "conta"], function () use ($router) {
                 $router->post("/cadastro", "EstabelecimentosController@store");
                 $router->post("/editar", "EstabelecimentosController@update");
+            });
+
+            $router->group(['prefix' => "clientes"], function () use ($router) {
+
             });
 
             $router->group(['prefix' => "campanhas"], function () use ($router) {

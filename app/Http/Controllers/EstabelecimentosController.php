@@ -18,10 +18,9 @@ use  LaravelQRCode\Facades\QRCode;
 class EstabelecimentosController extends Controller
 {
 
-    public function store(Request $request)
+    public function store(array $formData): array
     {
-        $res = DB::transaction(function () use ($request) {
-            $formData = $request->all();
+        $res = DB::transaction(function () use ($formData) {
 
             $validation = Validator::make(
                 $formData,
@@ -61,19 +60,17 @@ class EstabelecimentosController extends Controller
                 if ($usuarios->save()) {
                     DB::commit();
                     // Mail::to($formData['email'])->send(new BemVindoEstabelecimentos($estabelecimentos));
-
                     return ['status' => 'ok', 'mensagem' => 'Cadastro realizado com sucesso', 'body' => $estabelecimentos];
-                } else {
-                    DB::rollBack();
-                    return ['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do usuário.'];
                 }
-            } else {
-                DB::rollBack();
-                return ['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do estabelecimento.'];
-            }
-        });
 
-        return response()->json($res, ($res['status'] === 'erro' ? 400 : 200));
+                DB::rollBack();
+                return ['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do usuário.'];
+            }
+
+            DB::rollBack();
+            return ['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do estabelecimento.'];
+        });
+        return $res;
     }
 
     public function update(Request $request)
