@@ -18,6 +18,14 @@ use  LaravelQRCode\Facades\QRCode;
 class EstabelecimentosController extends Controller
 {
 
+    public function index(){
+
+    }
+
+    public function show(){
+
+    }
+
     public function store(array $formData): array
     {
         $res = DB::transaction(function () use ($formData) {
@@ -129,34 +137,6 @@ class EstabelecimentosController extends Controller
             return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível realizar o atualizar do estabelecimento.'], 400);
         } catch (\Throwable $th) {
             return response()->json(['status' => 'erro', 'mensagem' => $th->getMessage()], 400);
-        }
-    }
-
-    public function buscaEstabelecimento($id)
-    {
-        $estabelecimentos = Estabelecimentos::find($id);
-        if ($estabelecimentos['logomarca']) {
-            $estabelecimentos['logomarca'] = base64_encode(file_get_contents($estabelecimentos['logomarca']));
-        }
-        return response()->json($estabelecimentos);
-    }
-
-    public function uploadArquivo(string $arquivo)
-    {
-        if (strpos($arquivo, ';base64')) {
-
-            $pastaDestino = "logo-marca/";
-            $imagem_parts = explode(";base64,", $arquivo);
-            $imagem_type_aux = explode("image/", $imagem_parts[0]);
-            $imagem_type = $imagem_type_aux[1];
-            $imagem_base64 = base64_decode($imagem_parts[1]);
-            $arquivoSalvo = $pastaDestino . uniqid() . '.' . $imagem_type;
-            file_put_contents($arquivoSalvo, $imagem_base64);
-
-            return $formData['logomarca'] = $arquivoSalvo;
-        } else {
-            return response()
-                ->json(['message' => 'Erro ao salvar logomarca'], 400);
         }
     }
 
