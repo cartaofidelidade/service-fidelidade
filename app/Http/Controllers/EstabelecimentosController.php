@@ -6,6 +6,7 @@ use App\Models\Estabelecimentos;
 use App\Mail\BemVindoEstabelecimentos;
 
 use App\Models\Usuarios;
+use App\Utils\Arquivos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,11 +19,13 @@ use  LaravelQRCode\Facades\QRCode;
 class EstabelecimentosController extends Controller
 {
 
-    public function index(){
+    public function index()
+    {
 
     }
 
-    public function show(){
+    public function show()
+    {
 
     }
 
@@ -108,6 +111,10 @@ class EstabelecimentosController extends Controller
             if ($validation->fails())
                 return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
 
+            $logomarca = "";
+
+            if (isset($formData['logomarca']) && !empty($formData['logomarca']))
+                $logomarca = (new Arquivos())->upload($formData['logomarca'], 'estabelecimentos-logomarca/');
 
             $estabelecimentos = Estabelecimentos::find($estabelecimento->origem_id);
             $estabelecimentos->tipo_pessoa = $formData['tipo_pessoa'];
@@ -125,7 +132,7 @@ class EstabelecimentosController extends Controller
             $estabelecimentos->numero = $formData['numero'] != "" ? $formData['numero'] : null;
             $estabelecimentos->complemento = $formData['complemento'] ?? null;
             $estabelecimentos->bairro = $formData['bairro'] ?? null;
-            $estabelecimentos->logomarca = $this->uploadArquivo($formData['logomarca']) ?? null;
+            $estabelecimentos->logomarca = $logomarca;
             $estabelecimentos->nomelogomarca = $formData['logomarca'] ?? null;
             $estabelecimentos->estados_id = $formData['estados_id'] ?? null;
             $estabelecimentos->cidades_id = $formData['cidades_id'] ?? null;
