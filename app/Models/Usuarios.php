@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Usuarios extends Model implements AuthenticatableContract,  AuthorizableContract, JWTSubject
+class Usuarios extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable, HasFactory;
     use Uuid;

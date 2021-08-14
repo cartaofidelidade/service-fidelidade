@@ -32,7 +32,7 @@ if (isset($router)) {
 
             $router->post('/cadastro', 'AuthController@register');
 
-            $router->post("/recuperarSenha", "AuthController@recuperarSenha");
+            $router->post("/recuperar-senha", "AuthController@forgot");
             $router->post("/alterarSenha", "AuthController@alterarSenha");
         });
 
