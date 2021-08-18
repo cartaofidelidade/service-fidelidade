@@ -41,8 +41,8 @@ class CreateEstabelecimentos extends Migration
 
             $table->tinyInteger('ativo')->default(1)->nullable();
 
-            $table->timestamp('data_cadastro', 0);
-            $table->timestamp('data_alteracao', 0);
+            $table->timestamp('data_cadastro')->useCurrent();
+            $table->timestamp('data_alteracao')->useCurrent();
 
             $table->uuid('estados_id')->nullable();
             $table->uuid('cidades_id')->nullable();

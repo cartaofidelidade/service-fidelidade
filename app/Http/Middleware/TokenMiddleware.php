@@ -10,14 +10,12 @@ class TokenMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        // Pre-Middleware Action
-
         $token = $request->header('authorization');
 
         if (!$token)
@@ -28,7 +26,7 @@ class TokenMiddleware
         if (!$token)
             return response('Unauthorized.', 401);
 
-        $request->query('origem', $token->origem);
+        $request->origem = $token->origem;
 
         $response = $next($request);
         return $response;

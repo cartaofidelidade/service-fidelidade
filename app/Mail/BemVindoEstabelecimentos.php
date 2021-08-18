@@ -30,7 +30,7 @@ class BemVindoEstabelecimentos extends Mailable
 
     public function build()
     {
-        return $this->view('emails.register', ['nome' => $this->data->nome])
+        return $this->view('emails.register', ['nome' => $this->data->nome_fantasia])
             ->from("no-replay@primmvs.com")
             ->subject('Veja bem vindo parceiro')
             ->to($this->data->email);

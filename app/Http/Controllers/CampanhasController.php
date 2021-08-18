@@ -8,6 +8,7 @@ use GrahamCampbell\ResultType\Result;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class CampanhasController extends Controller
@@ -49,34 +50,28 @@ class CampanhasController extends Controller
 
     public function store(Request $request)
     {
+        $formData = $request->all();
 
-        try {
-            $estabelecimento = Auth::user();
-            $formData = $request->all();
-
-            $validation = Validator::make(
-                $formData,
+        $res = DB::transaction(function () use ($formData) {
+            $validation = Validator::make($formData,
                 [
                     'nome' => 'required',
                     'tipo' => 'required',
                     'data_inicio' => 'required',
                     'data_final' => 'required'
                 ],
-                [
-                    'required' => 'O campo :atribute é obrigatório'
-                ]
+                ['required' => 'O campo :atribute é obrigatório']
             );
 
             if ($validation->fails())
-                return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
+                return ['status' => 'erro', 'mensagem' => $validation->errors()->first()];
 
             $campanhas = new Campanhas();
 
-            $campanhas->estabelecimentos_id = $estabelecimento->origem_id;
+            $campanhas->estabelecimentos_id = Auth::user()->origem_id;
             $campanhas->codigo = substr(uniqid(rand()), 0, 6);
             $campanhas->nome = $formData['nome'];
             $campanhas->tipo = $formData['tipo'];
-
             $campanhas->pontos = $formData['pontos'] ?? 0;
             $campanhas->quantidade_carimbos = $formData['quantidade_carimbos'];
             $campanhas->limite_carimbos_dia = $formData['limite_carimbos_dia'];
@@ -84,38 +79,31 @@ class CampanhasController extends Controller
             $campanhas->data_final = $formData['data_final'];
             $campanhas->descricao = $formData['descricao'];
 
-            $campanhas->imagem_carimbo_preenchido = $this->uploadArquivo($formData['imagem_carimbo_preenchido']) ?? null;
-            $campanhas->imagem_carimbo_vazio = $this->uploadArquivo($formData['imagem_carimbo_vazio']) ?? null;
-
             if ($campanhas->save())
-                return response()->json($campanhas);
-            return response()->json(['status' => 'erro', 'mesnagem' => 'Não foi possível cadastrar a campanha.'], 400);
-        } catch (\Throwable $th) {
-            return response()->json(['status' => 'erro', 'mesnagem' => $th->getMessage()], 400);
-        }
+                return ['status' => 'ok', 'mensagem' => 'Cadastro realizado com sucesso', 'body' => $campanhas];
+            return ['status' => 'erro', 'mensagem' => 'Não foi possível cadastrar a campanha.'];
+        });
+
+        return response()->json($res, ($res['status'] === 'erro' ? 400 : 200));
     }
 
     public function update(Request $request, $id)
     {
-        try {
-            $estabelecimento = Auth::user();
-            $formData = $request->all();
+        $formData = $request->all();
 
-            $validation = Validator::make(
-                $formData,
+        $res = DB::transaction(function () use ($formData, $id) {
+            $validation = Validator::make($formData,
                 [
                     'nome' => 'required',
                     'tipo' => 'required',
                     'data_inicio' => 'required',
                     'data_final' => 'required'
                 ],
-                [
-                    'required' => 'O campo :atribute é obrigatório'
-                ]
+                ['required' => 'O campo :atribute é obrigatório']
             );
 
             if ($validation->fails())
-                return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
+                return ['status' => 'erro', 'mensagem' => $validation->errors()->first()];
 
             $campanhas = Campanhas::find($id);
 
@@ -128,49 +116,24 @@ class CampanhasController extends Controller
             $campanhas->data_final = $formData['data_final'];
             $campanhas->descricao = $formData['descricao'];
 
-            $campanhas->imagem_carimbo_preenchido = $this->uploadArquivo($formData['imagem_carimbo_preenchido']) ?? null;
-            $campanhas->imagem_carimbo_vazio = $this->uploadArquivo($formData['imagem_carimbo_vazio']) ?? null;
-
-
             if ($campanhas->save())
-                return response()->json($campanhas);
+                return ['status' => 'ok', 'mensagem' => 'Cadastro realizado com sucesso.'];
+            return ['status' => 'erro', 'mensagem' => 'Não foi possível cadastrar a campanha.'];
+        });
 
-            return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível cadastrar a campanha.'], 400);
-        } catch (\Throwable $th) {
-            return response()->json(['status' => 'erro', 'mensagem' => $th->getMessage()], 400);
-        }
+        return response()->json($res, ($res['status'] === 'erro' ? 400 : 200));
     }
 
     public function delete($id)
     {
-        try {
+        if (empty($id))
+            return response()->json(['status' => 'erro', 'mensagem' => 'Dados obrigatórios inválidos.'], 400);
 
-            $campanhas = Campanhas::find($id);
-            $campanhas->ativo = 0;
+        $campanhas = Campanhas::find($id);
+        $campanhas->ativo = 0;
 
-            if ($campanhas->save())
-                return response()->json($campanhas);
-        } catch (\Throwable $th) {
-            return response()->json(['status', 'erro', 'mensagem' => '', $th->getMessage()], 400);
-        }
-    }
-
-    public function uploadArquivo(string $arquivo)
-    {
-        if (strpos($arquivo, ';base64')) {
-
-            $pastaDestino = "carimbos/";
-            $imagem_parts = explode(";base64,", $arquivo);
-            $imagem_type_aux = explode("image/", $imagem_parts[0]);
-            $imagem_type = $imagem_type_aux[1];
-            $imagem_base64 = base64_decode($imagem_parts[1]);
-            $arquivoSalvo = $pastaDestino . uniqid() . '.' . $imagem_type;
-            file_put_contents($arquivoSalvo, $imagem_base64);
-
-            return $formData['logomarca'] = $arquivoSalvo;
-        } else {
-            return response()
-                ->json(['message' => 'Erro ao salvar carimbo'], 400);
-        }
+        if ($campanhas->save())
+            return response()->json(['status' => 'ok', 'mensagem' => 'Cadastro removido com sucesso.']);
+        return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível remover o cadastro.'], 400);
     }
 }

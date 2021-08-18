@@ -6,6 +6,7 @@ use App\Models\Estabelecimentos;
 use App\Mail\BemVindoEstabelecimentos;
 
 use App\Models\Usuarios;
+use App\Utils\Arquivos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,10 +19,19 @@ use  LaravelQRCode\Facades\QRCode;
 class EstabelecimentosController extends Controller
 {
 
-    public function store(Request $request)
+    public function index()
     {
-        $res = DB::transaction(function () use ($request) {
-            $formData = $request->all();
+
+    }
+
+    public function show()
+    {
+
+    }
+
+    public function store(array $formData): array
+    {
+        $res = DB::transaction(function () use ($formData) {
 
             $validation = Validator::make(
                 $formData,
@@ -61,19 +71,17 @@ class EstabelecimentosController extends Controller
                 if ($usuarios->save()) {
                     DB::commit();
                     // Mail::to($formData['email'])->send(new BemVindoEstabelecimentos($estabelecimentos));
-
                     return ['status' => 'ok', 'mensagem' => 'Cadastro realizado com sucesso', 'body' => $estabelecimentos];
-                } else {
-                    DB::rollBack();
-                    return ['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do usuário.'];
                 }
-            } else {
-                DB::rollBack();
-                return ['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do estabelecimento.'];
-            }
-        });
 
-        return response()->json($res, ($res['status'] === 'erro' ? 400 : 200));
+                DB::rollBack();
+                return ['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do usuário.'];
+            }
+
+            DB::rollBack();
+            return ['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do estabelecimento.'];
+        });
+        return $res;
     }
 
     public function update(Request $request)
@@ -103,6 +111,10 @@ class EstabelecimentosController extends Controller
             if ($validation->fails())
                 return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
 
+            $logomarca = "";
+
+            if (isset($formData['logomarca']) && !empty($formData['logomarca']))
+                $logomarca = (new Arquivos())->upload($formData['logomarca'], 'estabelecimentos-logomarca/');
 
             $estabelecimentos = Estabelecimentos::find($estabelecimento->origem_id);
             $estabelecimentos->tipo_pessoa = $formData['tipo_pessoa'];
@@ -120,7 +132,7 @@ class EstabelecimentosController extends Controller
             $estabelecimentos->numero = $formData['numero'] != "" ? $formData['numero'] : null;
             $estabelecimentos->complemento = $formData['complemento'] ?? null;
             $estabelecimentos->bairro = $formData['bairro'] ?? null;
-            $estabelecimentos->logomarca = $this->uploadArquivo($formData['logomarca']) ?? null;
+            $estabelecimentos->logomarca = $logomarca;
             $estabelecimentos->nomelogomarca = $formData['logomarca'] ?? null;
             $estabelecimentos->estados_id = $formData['estados_id'] ?? null;
             $estabelecimentos->cidades_id = $formData['cidades_id'] ?? null;
@@ -132,34 +144,6 @@ class EstabelecimentosController extends Controller
             return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível realizar o atualizar do estabelecimento.'], 400);
         } catch (\Throwable $th) {
             return response()->json(['status' => 'erro', 'mensagem' => $th->getMessage()], 400);
-        }
-    }
-
-    public function buscaEstabelecimento($id)
-    {
-        $estabelecimentos = Estabelecimentos::find($id);
-        if ($estabelecimentos['logomarca']) {
-            $estabelecimentos['logomarca'] = base64_encode(file_get_contents($estabelecimentos['logomarca']));
-        }
-        return response()->json($estabelecimentos);
-    }
-
-    public function uploadArquivo(string $arquivo)
-    {
-        if (strpos($arquivo, ';base64')) {
-
-            $pastaDestino = "logo-marca/";
-            $imagem_parts = explode(";base64,", $arquivo);
-            $imagem_type_aux = explode("image/", $imagem_parts[0]);
-            $imagem_type = $imagem_type_aux[1];
-            $imagem_base64 = base64_decode($imagem_parts[1]);
-            $arquivoSalvo = $pastaDestino . uniqid() . '.' . $imagem_type;
-            file_put_contents($arquivoSalvo, $imagem_base64);
-
-            return $formData['logomarca'] = $arquivoSalvo;
-        } else {
-            return response()
-                ->json(['message' => 'Erro ao salvar logomarca'], 400);
         }
     }
 
