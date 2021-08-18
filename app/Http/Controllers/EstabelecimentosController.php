@@ -15,18 +15,18 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use  LaravelQRCode\Facades\QRCode;
 
+use App\Utils\QRCodeUtils;
+
 
 class EstabelecimentosController extends Controller
 {
 
     public function index()
     {
-
     }
 
     public function show()
     {
-
     }
 
     public function store(array $formData): array
@@ -150,26 +150,28 @@ class EstabelecimentosController extends Controller
     public function geraQrCode()
     {
 
-        // $pastaDestino = "logo-marca/";
-        // $arquivoSalvo = $pastaDestino . uniqid() . '.' . 'jpg';
-        // file_put_contents($arquivoSalvo, QRCode::url('werneckbh.github.io/qr-code/')
-        //     ->setSize(8)
-        //     ->setMargin(2)
-        //     ->svg());
+    //   dd(  file_get_contents(QRCode::text("{Id:12asdasd}")
+    //   ->setSize(8)
+    //   ->setMargin(2)
+    //   ->png()));
 
-        // dd('sadas');
-        dd(QRCode::urlddd('werneckbh.github.io/qr-code/')
-            ->setSize(8)
-            ->setMargin(2)
-            ->svg());
+        file_put_contents(
+             'eu.png',
 
+             file_get_contents( QRCode::text("{Id:12asdasd}")
+                ->setSize(8)
+                ->setMargin(2)
+                ->png())
+        );
 
-        dd(file_get_contents(QRCode::url('werneckbh.github.io/qr-code/')
-            ->setSize(8)
-            ->setMargin(2)
-            ->svg()));
+        // dd(base64_encode(
 
+        //     QRCode::text("{Id:12asdasd}")
+        //         ->setSize(8)
+        //         ->setMargin(2)
+        //         ->png()
+        // ));
 
-        return QRCode::text('Laravel QR Code Generator!')->png();
+        // return QRCode::text('Laravel QR Code Generator!')->png();
     }
 }

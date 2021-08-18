@@ -122,7 +122,9 @@ $app->alias('QRCode', LaravelQRCode\Facades\QRCode::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
 $app->singleton('filesystem', function ($app) {
-    return $app->loadComponent('filesystems', 'Illuminate\Filesystem\FilesystemServiceProvider', 'filesystem');
+    return $app->loadComponent('filesystems', 
+    'Illuminate\Filesystem\FilesystemServiceProvider', 
+    'filesystem');
 });
 
 /*
