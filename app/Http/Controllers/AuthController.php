@@ -61,8 +61,9 @@ class AuthController extends Controller
         return 'login';
     }
 
-    public function register()
+    public function register(Request $request)
     {
+        dd($request);
     }
 
     public function recuperarSenha(Request $request)
