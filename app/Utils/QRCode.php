@@ -18,11 +18,10 @@ class QRCodeUtils
         // ->png())); 
 
         return 'fsdfsd';
-        return file_get_contents(QRCode::text("{Id:" . $id . "}")
+        return  file_get_contents(QRCode::text("{Id:" . $id . "}")
             ->setSize(8)
             ->setMargin(2)
             ->png());
-
 
 
 

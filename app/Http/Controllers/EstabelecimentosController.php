@@ -31,7 +31,9 @@ class EstabelecimentosController extends Controller
 
     public function store(array $formData): array
     {
-        $res = DB::transaction(function () use ($formData) {
+
+
+        $response = DB::transaction(function () use ($formData) {
 
             $validation = Validator::make(
                 $formData,
@@ -48,6 +50,7 @@ class EstabelecimentosController extends Controller
                     'min' => 'O campo :attribute deve ser pelo menos :min caracteres.'
                 ]
             );
+
 
             if ($validation->fails()) {
                 DB::rollBack();
@@ -81,7 +84,7 @@ class EstabelecimentosController extends Controller
             DB::rollBack();
             return ['status' => 'erro', 'mesnagem' => 'Não foi possível realizar o cadastro do estabelecimento.'];
         });
-        return $res;
+        return $response;
     }
 
     public function update(Request $request)
@@ -116,6 +119,9 @@ class EstabelecimentosController extends Controller
             if (isset($formData['logomarca']) && !empty($formData['logomarca']))
                 $logomarca = (new Arquivos())->upload($formData['logomarca'], 'estabelecimentos-logomarca/');
 
+
+            // dd($formData);
+
             $estabelecimentos = Estabelecimentos::find($estabelecimento->origem_id);
             $estabelecimentos->tipo_pessoa = $formData['tipo_pessoa'];
             $estabelecimentos->nome = $formData['nome'];
@@ -132,8 +138,7 @@ class EstabelecimentosController extends Controller
             $estabelecimentos->numero = $formData['numero'] != "" ? $formData['numero'] : null;
             $estabelecimentos->complemento = $formData['complemento'] ?? null;
             $estabelecimentos->bairro = $formData['bairro'] ?? null;
-            $estabelecimentos->logomarca = $logomarca;
-            $estabelecimentos->nomelogomarca = $formData['logomarca'] ?? null;
+            $estabelecimentos->logomarca = $logomarca;            
             $estabelecimentos->estados_id = $formData['estados_id'] ?? null;
             $estabelecimentos->cidades_id = $formData['cidades_id'] ?? null;
             $estabelecimentos->segmentos_id = $formData['segmentos_id'] ?? null;
@@ -150,19 +155,32 @@ class EstabelecimentosController extends Controller
     public function geraQrCode()
     {
 
-    //   dd(  file_get_contents(QRCode::text("{Id:12asdasd}")
-    //   ->setSize(8)
-    //   ->setMargin(2)
-    //   ->png()));
+        //   dd(  file_get_contents(QRCode::text("{Id:12asdasd}")
+        //   ->setSize(8)
+        //   ->setMargin(2)
+        //   ->png()));
 
-        file_put_contents(
-             'eu.png',
+        // dd('regis nunes');
 
-             file_get_contents( QRCode::text("{Id:12asdasd}")
-                ->setSize(8)
-                ->setMargin(2)
-                ->png())
-        );
+        $qrCode = QRCode::text("{Id:12asdasd}")
+            ->setSize(8)
+            ->setMargin(2)
+            ->png();
+
+
+        return base64_encode(file_get_contents($qrCode));
+
+        return response()->json(['status' => 'erro', 'mensagem' => base64_encode(file_get_contents($qrCode))], 400);
+
+
+        // file_put_contents(
+        //      'eu.png',
+
+        //      file_get_contents( QRCode::text("{Id:12asdasd}")
+        //         ->setSize(8)
+        //         ->setMargin(2)
+        //         ->png())
+        // );
 
         // dd(base64_encode(
 

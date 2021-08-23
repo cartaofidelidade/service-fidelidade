@@ -51,7 +51,7 @@ if (isset($router)) {
                 $router->get('/buscaCampanha/{id}', 'CampanhasController@show');
 
                 $router->post('/cadastro', 'CampanhasController@store');
-                $router->post('/editar/{id}', 'CampanhasController@update');
+                $router->put('/editar/{id}', 'CampanhasController@store');
                 $router->post('delete/{id}', 'CampanhasController@delete');
             });
         });

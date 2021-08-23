@@ -24,64 +24,61 @@ class ClientesController extends Controller
     {
     }
 
-    public function store(Request $request)
+    public function store(array $formData)
     {
 
-        try {
-            $res = DB::transaction(function () use ($request) {
-                
-                $formData = $request->all();
-                $validation = Validator::make(
-                    $formData,
-                    [
-                        'nome' => 'required',
-                        'email' => 'required|email|unique:clientes',
-                    ],
-                    [
-                        'required' => 'O campo :atribute é obrigatório',
-                        'email' => 'O campo :attribute deve ser um endereço de e-mail válido.',
-                        'unique' => 'O campo :attribute já possui um registro.'
-                    ]
-                );
 
-                if ($validation->fails()) {
-                    DB::rollBack();
-                    return response()->json(['status' => 'erro', 'mensagem' => $validation->errors()->first()], 400);
-                }
+        $response = DB::transaction(function () use ($formData) {
+            $validation = Validator::make(
+                $formData,
+                [
+                    'nome' => 'required',
+                    'email' => 'required|email|unique:clientes',
+                ],
+                [
+                    'required' => 'O campo :atribute é obrigatório',
+                    'email' => 'O campo :attribute deve ser um endereço de e-mail válido.',
+                    'unique' => 'O campo :attribute já possui um registro.'
+                ]
+            );
 
-                $clientes = new Clientes();
 
-                $clientes->nome = $formData['nome'];
-                $clientes->email = $formData['email'];
-                $clientes->latitude = $formData['latitude'] ?? null;
-                $clientes->longitude = $formData['longitude'] ?? null;
+            if ($validation->fails()) {
+                DB::rollBack();
+                return  ['status' => 'erro', 'mensagem' => $validation->errors()->first()];
+            }
 
-                if ($clientes->save()) {
-                    $usuarios = new Usuarios();
+            $clientes = new Clientes();
 
-                    $usuarios->login = $formData['login'];
-                    $usuarios->senha = Hash::make($formData['senha']);
-                    $usuarios->origem = 2;
-                    $usuarios->origem_id = $clientes->id;
+            $clientes->nome = $formData['nome'];
+            $clientes->email = $formData['email'];
+            $clientes->latitude = $formData['latitude'] ?? null;
+            $clientes->longitude = $formData['longitude'] ?? null;
 
-                    if ($usuarios->save()) {
-                        DB::commit();
+            if ($clientes->save()) {
+                $usuarios = new Usuarios();
 
-                        // Mail::to($formData['email'])->send(new BemVindoClientes($clientes));
+                $usuarios->login = $formData['login'];
+                $usuarios->senha = Hash::make($formData['senha']);
+                $usuarios->origem = 2;
+                $usuarios->origem_id = $clientes->id;
 
-                        return response()->json(['status' => 'ok', 'mensagem' => 'Cadastro realizado com sucesso.']);
-                    } else {
-                        DB::rollBack();
-                        return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível realizar o cadastro do usuário.'], 400);
-                    }
+                if ($usuarios->save()) {
+                    DB::commit();
+                    // Mail::to($formData['email'])->send(new BemVindoClientes($clientes));
+
+                    return ['status' => 'ok', 'mensagem' => 'Cadastro realizado com sucesso', 'body' => $clientes];
                 } else {
                     DB::rollBack();
-                    return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível realizar o cadastro do cliente.'], 400);
+                    return ['status' => 'erro', 'mensagem' => 'Não foi possível realizar o cadastro do usuário.'];
                 }
-            });
-        } catch (\Throwable $th) {
-            return response()->json(['status' => 'erro', 'mensagem' => $th->getMessage()], 400);
-        }
+            } else {
+                DB::rollBack();
+                return ['status' => 'erro', 'mensagem' => 'Não foi possível realizar o cadastro do cliente.'];
+            }
+        });
+
+        return $response;
     }
 
     public function update(Request $request, $id)

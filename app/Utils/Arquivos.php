@@ -12,8 +12,15 @@ class Arquivos
         $imagem_base64 = base64_decode($imagem_parts[1]);
 
         $name_arquivo = uniqid() . '.' . $imagem_type;
-        file_put_contents(public_path() . $path . $name_arquivo, $imagem_base64);
+        file_put_contents($path . $name_arquivo, $imagem_base64);
 
-        return $name_arquivo;
+        return $path . $name_arquivo;
+    }
+
+    public function converteImagemBase64(string $path)
+    {
+    
+      return base64_encode(file_get_contents($path));
+    
     }
 }

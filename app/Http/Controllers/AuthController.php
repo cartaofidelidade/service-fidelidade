@@ -65,10 +65,14 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+       
         $register = [];
 
         if ((int)$request->origem === 1)
             $register = (new EstabelecimentosController())->store($request->all());
+
+        if ((int)$request->origem === 2)
+            $register = (new ClientesController())->store($request->all());
 
         return response()->json($register, ($register['status'] === 'erro' ? 400 : 200));
     }
@@ -89,7 +93,7 @@ class AuthController extends Controller
         Mail::to($forgot['body']['email'])->send(new Forgot($forgot['body']));
 
         unset($forgot['body']);
-        
+
         return response()->json($forgot, ($forgot['status'] === 'erro' ? 400 : 200));
     }
 

@@ -13,7 +13,7 @@ class CartelasController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth', ['except' => ['store']]);
+        // $this->middleware('auth', ['except' => ['store']]);
     }
 
     public function index(Request $request)
@@ -61,6 +61,12 @@ class CartelasController extends Controller
             return response()->json(['status' => 'erro', 'mensagem' => $th->getMessage()], 400);
         }
     }
+
+    public function listClient()
+    {
+        
+    }
+
 
     public function validaCarimbos($id)
     {
