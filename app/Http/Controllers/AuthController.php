@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Clientes;
 use App\Models\Estabelecimentos;
 use App\Models\Usuarios;
+use App\Models\TokensUsuarios;
 use App\Mail\Forgot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -65,7 +66,7 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-       
+
         $register = [];
 
         if ((int)$request->origem === 1)
@@ -81,11 +82,15 @@ class AuthController extends Controller
     {
         $forgot = [];
 
+        // dd($request);
+
         if (!isset($request->login) or empty($request->login))
             return ['status' => 'erro', 'message' => 'Dados obrigatórios inválidos.'];
 
-        if ((int)$request->origem === 1)
-            $forgot = (new UsuariosController())->checkUsuario(['login' => $request->login, 'origem' => $request->origem]);
+        // if ((int)$request->origem === 1)
+        $forgot = (new UsuariosController())->checkUsuario(['login' => $request->login, 'origem' => $request->origem]);
+
+
 
         if ($forgot['status'] === 'erro')
             return response()->json($forgot, 400);
@@ -99,22 +104,32 @@ class AuthController extends Controller
 
     public function checkTokenForgot(Request $request)
     {
+        $formData = $request->all();
+        $usuario = TokensUsuarios::where('token', '=', $formData['token'])->get();
+
+
+        if ($usuario->data_expiracao < date('Y-m-d h:i:s'))
+            return response()->json(['status' => 'erro', 'mensagem' => 'Token expirado'], 400);
+
+        $usuarios = Usuarios::find($usuario[0]->usuarios_id);
+        $usuarios->senha = Hash::make($formData['senha']);
+       
+
+        if ($usuarios->save()) {
+            return response()->json($usuarios);
+        }
     }
 
     public function changePassword(Request $request)
     {
         $formData = $request->all();
+        $usuarios = Usuarios::find($formData['id']);
 
-        $usuario = Usuarios::where('tokenAlteracaoSenha', '=', $formData['token'])->get();
+        if (!isset($usuarios[0]->id))
+        return response()->json(['status' => 'erro', 'mensagem' => 'Usuario não localizado.'], 400);
 
-        if (!isset($usuario[0]->id))
-            return response()->json(['status' => 'erro', 'mensagem' => 'Usuario não localizado.'], 400);
-
-
-        $usuarios = Usuarios::find($usuario[0]->id);
         $usuarios->senha = Hash::make($formData['senha']);
-        $usuarios->tokenAlteracaoSenha = null;
-
+       
         if ($usuarios->save()) {
             return response()->json($usuarios);
         }
