@@ -22,7 +22,7 @@ if (isset($router)) {
             });
 
             $router->group(["prefix" => "cartelas"], function () use ($router) {
-                $router->post('/cadastro', 'CartelasController@store');
+                $router->post('/cadastro', 'CartelasController@storeClient');
             });
         });
 
@@ -34,7 +34,7 @@ if (isset($router)) {
 
             $router->post("/recuperar-senha", "AuthController@forgot");
             $router->post("/verifica-token", "AuthController@checkTokenForgot");
-            $router->post("/alterarSenha", "AuthController@alterarSenha");
+            $router->post("/alterarSenhaToken", "AuthController@changePasswordToken");
         });
 
         $router->group(["prefix" => "estabelecimentos"], function () use ($router) {
@@ -54,6 +54,12 @@ if (isset($router)) {
                 $router->post('/cadastro', 'CampanhasController@store');
                 $router->put('/editar/{id}', 'CampanhasController@store');
                 $router->post('delete/{id}', 'CampanhasController@delete');
+            });
+
+            $router->group(['prefix' => "cartelas"], function () use ($router) {  
+
+                $router->post('/cadastro', 'CartelasController@store');               
+                $router->post('delete/{id}', 'CartelasController@delete');
             });
         });
 

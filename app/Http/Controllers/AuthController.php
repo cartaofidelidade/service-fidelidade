@@ -117,10 +117,13 @@ class AuthController extends Controller
         if (!isset($usuarios->usuarios_id))
             return response()->json(['status' => 'erro', 'mensagem' => 'Usuario não localizado.'], 400);
 
-        $usuarios->senha = Hash::make($formData['senha']);
 
-        if ($usuarios->save()) {
-            return response()->json($usuarios);
+        $usuario = Usuarios::find($usuarios->usuarios_id);
+        $usuario->senha = Hash::make($formData['senha']);
+
+
+        if ($usuario->save()) {
+            return response()->json($usuario);
         }
     }
     public function changePassword(Request $request)

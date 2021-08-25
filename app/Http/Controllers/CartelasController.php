@@ -40,6 +40,24 @@ class CartelasController extends Controller
     {
 
         try {
+            $formData = $request->all();
+            $cartelas = new Cartelas();
+
+            $cartelas->campanhas_id = $formData['campanhas_id'];
+            $cartelas->clientes_id = $formData['clientes_id'];
+
+            if ($cartelas->save())
+                return response()->json($cartelas);
+
+            return response()->json(['status' => 'erro', 'mensagem' => 'Erro ao adicionar carimbo.'], 400);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => 'erro', 'mensagem' => $th->getMessage()], 400);
+        }
+    }
+    public function storeClient(Request $request)
+    {
+
+        try {
 
             $cliente = Auth::user();
             $formData = $request->all();
@@ -47,7 +65,7 @@ class CartelasController extends Controller
             $cartelas = new Cartelas();
 
             $cartelas->campanhas_id = $formData['campanhas_id'];
-            $cartelas->clientes_id = $formData['clientes_id'];
+            $cartelas->clientes_id =  $cliente->id;
 
             if ($this->validaCarimbos($formData['campanhas_id']))
                 return response()->json(['status' => 'erro', 'mensagem' => 'Limite diario atingido.'], 400);
@@ -64,7 +82,6 @@ class CartelasController extends Controller
 
     public function listClient()
     {
-        
     }
 
 
@@ -72,12 +89,11 @@ class CartelasController extends Controller
     {
 
         $campanhas = Campanhas::find($id);
-        $cliente = Auth::user();
+        $cliente = Auth::user()->id;
 
-        $cartelas = Cartelas::where('clientes_id', '<=', '07527786-8dea-46b3-8490-27b5171f94c8')
+        $cartelas = Cartelas::where('clientes_id', '<=', $cliente)
             ->where('campanhas_id', '<=', $id)
-            ->whereDate('created_at', date('Y-m-d'))
-            // ->whereDate('data_cadastro', date('Y-m-d'))
+            ->whereDate('data_cadastro', date('Y-m-d'))
             ->get();
 
         if ($campanhas->limite_carimbos_dia < $cartelas->count())
