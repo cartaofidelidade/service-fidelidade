@@ -32,6 +32,7 @@ class EstabelecimentosController extends Controller
     public function store(array $formData): array
     {
 
+        dd($formData);
 
         $response = DB::transaction(function () use ($formData) {
 

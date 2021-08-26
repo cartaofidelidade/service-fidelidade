@@ -69,6 +69,8 @@ class AuthController extends Controller
 
         $register = [];
 
+        dd($request->all());
+
         if ((int)$request->origem === 1)
             $register = (new EstabelecimentosController())->store($request->all());
 
