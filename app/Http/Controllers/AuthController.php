@@ -84,7 +84,7 @@ class AuthController extends Controller
 
 
         if (!isset($request->login) or empty($request->login))
-            return ['status' => 'erro', 'message' => 'Dados obrigatórios inválidos.'];
+            return ['status' => 'erro', 'mensagem' => 'Dados obrigatórios inválidos.'];
 
         $forgot = (new UsuariosController())->checkUsuario(['login' => $request->login, 'origem' => $request->origem]);
 
