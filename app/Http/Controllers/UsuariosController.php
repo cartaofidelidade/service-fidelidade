@@ -27,7 +27,7 @@ class UsuariosController extends Controller
             if ($validation->fails())
                 return ['status' => 'erro', 'message' => $validation->errors()->first()];
 
-            $usuarios = new UsuariosModel();
+            $usuarios = new Usuarios();
 
             $usuarios->IndividuosId = $individuos;
             $usuarios->Login = $data['Login'];
