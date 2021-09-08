@@ -18,6 +18,8 @@ class ClientesController extends Controller
 
     public function index($router)
     {
+        $cartela = Clientes::find('');
+        $clientes = $cartela->cartelas()->first();
     }
 
     public function show($router)

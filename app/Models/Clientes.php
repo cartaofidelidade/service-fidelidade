@@ -29,4 +29,11 @@ class Clientes extends Model
     ];
 
     protected $hidden = [];
+
+    public function cartelas()
+    {
+        return $this->hasOne(Cartelas::class,'clientes_id','id');
+    }
+    
 }
+
