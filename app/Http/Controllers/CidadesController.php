@@ -14,8 +14,8 @@ class CidadesController extends Controller
         if (isset($request->nome) && !empty($request->nome))
             $params['nome'] = $request->nome;
 
-        if (isset($request->estadoId) && !empty($request->estadoId))
-            $params['estados_id'] = $request->estadoId;
+        if (isset($request->estados_id) && !empty($request->estados_id))
+            $params['estados_id'] = $request->estados_id;
 
         if (isset($request->id) && !empty($request->id))
             $params['id'] = $request->id;

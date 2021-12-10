@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Mail;
 use  LaravelQRCode\Facades\QRCode;
 
 use App\Utils\QRCodeUtils;
-
+use Dotenv\Util\Str;
 
 class EstabelecimentosController extends Controller
 {
@@ -25,8 +25,16 @@ class EstabelecimentosController extends Controller
     {
     }
 
-    public function show()
+    public function show(string $id)
     {
+        $estabelecimento = Estabelecimentos::find(Auth::user()->origem_id);
+
+        if($estabelecimento->logomarca){
+            $estabelecimento->logomarca = (new Arquivos())->converteImagemBase64($estabelecimento->logomarca);
+        }
+        
+
+        return response()->json($estabelecimento);
     }
 
     public function store(array $formData): array
@@ -85,13 +93,11 @@ class EstabelecimentosController extends Controller
         return $response;
     }
 
-    public function update(Request $request)
+    public function update(Request $request, string $id)
     {
         try {
-            $estabelecimento = Auth::user();
 
             $formData = $request->all();
-
             $validation = Validator::make(
                 $formData,
                 [
@@ -99,8 +105,6 @@ class EstabelecimentosController extends Controller
                     'email' => 'required|email',
                     'documento' => 'required',
                     'segmentos_id' => 'required',
-                    'estados_id' => 'required',
-                    'cidades_id' => 'required'
                 ],
                 [
                     'required' => 'O campo :atribute é obrigatório',
@@ -118,12 +122,12 @@ class EstabelecimentosController extends Controller
                 $logomarca = (new Arquivos())->upload($formData['logomarca'], 'estabelecimentos-logomarca/');
 
 
-            // dd($formData);
-
-            $estabelecimentos = Estabelecimentos::find($estabelecimento->origem_id);
-            $estabelecimentos->tipo_pessoa = $formData['tipo_pessoa'];
+            $estabelecimentos = Estabelecimentos::find( Auth::user()->origem_id);
+            $estabelecimentos->tipo_pessoa = 2;
+            // $estabelecimentos->tipo_pessoa = $formData['tipo_pessoa'];
             $estabelecimentos->nome = $formData['nome'];
             $estabelecimentos->nome_fantasia = $formData['nome_fantasia'] ?? null;
+            $estabelecimentos->nome_fantasia = $formData['nome'] ?? null;
             $estabelecimentos->documento = $formData['documento'];
             $estabelecimentos->email = $formData['email'];
             $estabelecimentos->celular = $formData['celular'] ?? null;
@@ -131,23 +135,38 @@ class EstabelecimentosController extends Controller
             $estabelecimentos->facebook = $formData['facebook'] ?? null;
             $estabelecimentos->instagram = $formData['instagram'] ?? null;
             $estabelecimentos->site = $formData['site'] ?? null;
-            $estabelecimentos->cep = $formData['cep'] ?? null;
-            $estabelecimentos->logradouro = $formData['logradouro'] ?? null;
-            $estabelecimentos->numero = $formData['numero'] != "" ? $formData['numero'] : null;
-            $estabelecimentos->complemento = $formData['complemento'] ?? null;
-            $estabelecimentos->bairro = $formData['bairro'] ?? null;
-            $estabelecimentos->logomarca = $logomarca;            
-            $estabelecimentos->estados_id = $formData['estados_id'] ?? null;
-            $estabelecimentos->cidades_id = $formData['cidades_id'] ?? null;
+            $estabelecimentos->logomarca = $logomarca;
             $estabelecimentos->segmentos_id = $formData['segmentos_id'] ?? null;
 
             if ($estabelecimentos->save())
-                return response()->json($estabelecimentos);
+                return response()->json(['status' => 'ok', 'mensagem' => 'Dados atualizados com sucesso.']);
 
             return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível realizar o atualizar do estabelecimento.'], 400);
         } catch (\Throwable $th) {
             return response()->json(['status' => 'erro', 'mensagem' => $th->getMessage()], 400);
         }
+    }
+
+
+
+    public function updateAddress(string $id, Request $request)
+    {
+        $formData = $request->all();
+
+        $estabelecimentos = Estabelecimentos::find(Auth::user()->origem_id);
+        $estabelecimentos->cep = $formData['cep'] ?? null;
+        $estabelecimentos->logradouro = $formData['logradouro'] ?? null;
+        $estabelecimentos->numero = $formData['numero'] ?? null;
+        $estabelecimentos->complemento = $formData['complemento'] ?? null;
+        $estabelecimentos->bairro = $formData['bairro'] ?? null;
+        $estabelecimentos->estados_id = $formData['estados_id'] ?? null;
+        $estabelecimentos->cidades_id = $formData['cidades_id'] ?? null;
+
+
+        if ($estabelecimentos->save())
+            return response()->json(['status' => 'ok', 'mensagem' => 'Endereço atualizado com sucesso.']);
+
+        return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível realizar o atualizar do estabelecimento.'], 400);
     }
 
     public function geraQrCode()
