@@ -25,14 +25,16 @@ class EstabelecimentosController extends Controller
     {
     }
 
-    public function show(string $id)
+    public function show()
     {
         $estabelecimento = Estabelecimentos::find(Auth::user()->origem_id);
 
         if($estabelecimento->logomarca){
             $estabelecimento->logomarca = (new Arquivos())->converteImagemBase64($estabelecimento->logomarca);
+        }else{
+            $estabelecimento->logomarca = (new Arquivos())->converteImagemBase64('estabelecimentos-logomarca/61bd445cda977.png');
         }
-        
+
 
         return response()->json($estabelecimento);
     }
@@ -151,62 +153,26 @@ class EstabelecimentosController extends Controller
 
     public function updateAddress(string $id, Request $request)
     {
-        $formData = $request->all();
+        try{
+            $formData = $request->all();
 
-        $estabelecimentos = Estabelecimentos::find(Auth::user()->origem_id);
-        $estabelecimentos->cep = $formData['cep'] ?? null;
-        $estabelecimentos->logradouro = $formData['logradouro'] ?? null;
-        $estabelecimentos->numero = $formData['numero'] ?? null;
-        $estabelecimentos->complemento = $formData['complemento'] ?? null;
-        $estabelecimentos->bairro = $formData['bairro'] ?? null;
-        $estabelecimentos->estados_id = $formData['estados_id'] ?? null;
-        $estabelecimentos->cidades_id = $formData['cidades_id'] ?? null;
+            $estabelecimentos = Estabelecimentos::find(Auth::user()->origem_id);
+            $estabelecimentos->cep = $formData['cep'] ?? null;
+            $estabelecimentos->logradouro = $formData['logradouro'] ?? null;
+            $estabelecimentos->numero = $formData['numero'] ?? null;
+            $estabelecimentos->complemento = $formData['complemento'] ?? null;
+            $estabelecimentos->bairro = $formData['bairro'] ?? null;
+            $estabelecimentos->estados_id = $formData['estados_id'] ?? null;
+            $estabelecimentos->cidades_id = $formData['cidades_id'] ?? null;
+
+            if ($estabelecimentos->save())
+                return response()->json(['status' => 'ok', 'mensagem' => 'Endereço atualizado com sucesso.']);
+
+        }catch (\Throwable $th){
+            return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível realizar o atualizar do estabelecimento.'.$th->getMessage()], 400);
+        }
 
 
-        if ($estabelecimentos->save())
-            return response()->json(['status' => 'ok', 'mensagem' => 'Endereço atualizado com sucesso.']);
-
-        return response()->json(['status' => 'erro', 'mensagem' => 'Não foi possível realizar o atualizar do estabelecimento.'], 400);
     }
 
-    public function geraQrCode()
-    {
-
-        //   dd(  file_get_contents(QRCode::text("{Id:12asdasd}")
-        //   ->setSize(8)
-        //   ->setMargin(2)
-        //   ->png()));
-
-        // dd('regis nunes');
-
-        $qrCode = QRCode::text("{Id:12asdasd}")
-            ->setSize(8)
-            ->setMargin(2)
-            ->png();
-
-
-        return base64_encode(file_get_contents($qrCode));
-
-        return response()->json(['status' => 'erro', 'mensagem' => base64_encode(file_get_contents($qrCode))], 400);
-
-
-        // file_put_contents(
-        //      'eu.png',
-
-        //      file_get_contents( QRCode::text("{Id:12asdasd}")
-        //         ->setSize(8)
-        //         ->setMargin(2)
-        //         ->png())
-        // );
-
-        // dd(base64_encode(
-
-        //     QRCode::text("{Id:12asdasd}")
-        //         ->setSize(8)
-        //         ->setMargin(2)
-        //         ->png()
-        // ));
-
-        // return QRCode::text('Laravel QR Code Generator!')->png();
-    }
 }

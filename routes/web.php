@@ -40,7 +40,7 @@ if (isset($router)) {
                 $router->post("/cadastro", "EstabelecimentosController@store");
                 $router->put("/{id}", "EstabelecimentosController@update");
                 $router->put("/endereco/{id}", "EstabelecimentosController@updateAddress");
-                $router->get("/{id}", "EstabelecimentosController@show");
+                $router->get("/", "EstabelecimentosController@show");
             });
 
             $router->group(['prefix' => "clientes"], function () use ($router) {
